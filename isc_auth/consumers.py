@@ -4,8 +4,8 @@ from channels.sessions import channel_session
 from django.core.cache import cache
 
 import json
-from tools.auth_tools import app_auth_tools
-from tools.uniform_tools import *
+from isc_auth.tools.auth_tools import app_auth_tools
+from isc_auth.tools.uniform_tools import *
 from .models import Device
 from django.db.models import Empty
 
@@ -90,7 +90,7 @@ def auth_message_handle(message,api_hostname,identifer):
     random = message.channel_session['setup_random']
     try:
         prefix, = app_auth_tools.decrypt_and_validate_info(info,key,random,app_auth_tools.CONNECTION_REPLY_PREFIX)
-    except Exception,e:
+    except Exception as e:
         message.reply_channel.send({"close":True})
         return
     else:

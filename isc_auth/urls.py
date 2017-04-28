@@ -1,6 +1,6 @@
 from django.conf.urls import include,url
-import explicit_auth.views
-
+from isc_auth.explicit_auth import views
+from isc_auth import explicit_auth
 
 
 app_name = 'isc_auth'

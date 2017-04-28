@@ -31,7 +31,7 @@ def auth_pre(request,api_hostname):
     #若找不到对应的account,返回404
     try:
         account = Account.objects.get(api_hostname=api_hostname)
-    except Account.DoesNotExist,e:
+    except Account.DoesNotExist as e:
          return render(request,'explicit_auth/not_found.html')
 
     #检验参数是否错误，错误均返回403
@@ -42,18 +42,18 @@ def auth_pre(request,api_hostname):
     #'sha_1':加密信息}
     try:
         sig = duoTools.parseDuoSig(tx)
-    except duoTools.DuoFormatException,e:
-        return render(request,'explicit_auth/dennied.html')
+    except duoTools.DuoFormatException as e:
+        return render(request,'explicit_auth/explicit_auth/dennied.html')
     #若sig中的ikey未注册于apihostname下，返回403
     iKey = sig['content'][1]
     try:
         app = Application.objects.get(iKey=iKey,account__api_hostname=api_hostname)
-    except Application.DoesNotExist,e:
-        return render(request,'explicit_auth/dennied.html')
+    except Application.DoesNotExist as e:
+        return render(request,'explicit_auth/explicit_auth/dennied.html')
     sKey = app.sKey
     #若sig存在信息错误或加密错误，返回403
     if not duoTools.validateParams(sig,sKey):
-        return render(request,'explicit_auth/dennied.html')
+        return render(request,'explicit_auth/explicit_auth/dennied.html')
 
 
     #若user未enroll，进行enroll,若user已经enroll，但未激活设备，进行设备激活
@@ -145,7 +145,7 @@ def do_enroll(request,api_hostname):
     try:
         user = User.objects.create(user_name=userName,user_phone=phone,account=account)
         device = Device.objects.create(user=user,account=account,**Device.new_device(api_hostname))
-    except IntegrityError,e:
+    except IntegrityError as e:
         user = User.objects.get(user_name=userName)
         device = user.device_set.all()[0]
     return HttpResponse(json.dumps({"status":"succeed","identifer":device.identifer}))
@@ -162,7 +162,7 @@ def do_enroll(request,api_hostname):
 def bind_device(request,api_hostname,identifer):
     #生成二维码，秘钥并存入数据库。
     dkey = app_auth_tools.generate_aes_key()
-    print dkey
+    print(dkey)
     captcha = app_auth_tools.generate_captcha(api_hostname,identifer,dkey)
     #cache有效期设置比等待时间稍小
     cache.set("device-%s-%s_key" %(identifer,api_hostname),dkey,178)
@@ -178,7 +178,7 @@ def check_bind(request,api_hostname,identifer):
     #每10秒检查一次socket连接,最多不超过180秒
     #300
     for i in xrange(36):
-        print i
+        print(i)
         group_name = "device-%s-%s" %(identifer,api_hostname)
         device_group_list = channel_layer.group_channels(group_name)
         if len(device_group_list)>0:

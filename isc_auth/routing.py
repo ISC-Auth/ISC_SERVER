@@ -3,8 +3,8 @@
 from channels import route
 from channels.routing import null_consumer
 from .consumers import ws_connect,ws_message,ws_disconnect,auth_message_handle,send_account_info_handle
-from explicit_auth.consumers import explicit_auth_message_handle
-from tools.auth_tools.app_auth_tools import EXPLICIT_REPLY_COMMAND,REQUIRE_INFO_COMMAND
+from isc_auth.explicit_auth.consumers import explicit_auth_message_handle
+from isc_auth.tools.auth_tools.app_auth_tools import EXPLICIT_REPLY_COMMAND,REQUIRE_INFO_COMMAND
 
 websocket_path = r"^/api-(?P<api_hostname>[a-zA-Z0-9]+)/(?P<identifer>[a-zA-Z0-9]{20})$"
 

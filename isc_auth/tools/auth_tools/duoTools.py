@@ -5,7 +5,8 @@ from isc_auth.models import Account,Application,createRandomFields,User
 from isc_auth.tools.uniform_tools import createRandomFields
 
 
-import hashlib,hmac,time,qrcode,cStringIO,base64
+import hashlib,hmac,time,qrcode,base64
+from io import StringIO
 from Crypto.Cipher import AES
  
 
@@ -34,10 +35,11 @@ def parseDuoSig(sig):
     try:
         #将cookie解码后转换为Unicode
         import chardet
-        s = [c.decode(chardet.detect(c)['encoding'])  \
-            for c in base64.b64decode(cookie).split('|')]
+        cookieByte = base64.b64decode(cookie)
+        s = [c  \
+            for c in cookieByte.decode(chardet.detect(cookieByte)['encoding']).split('|')]
 
-    except TypeError,e:
+    except TypeError as e:
         raise DuoFormatException()
     if len(s) != 3:
         raise DuoFormatException()
@@ -48,10 +50,11 @@ def parseDuoSig(sig):
         'content':s,
         'sha_1':sha_1
     }
+    print(ret)
     return ret
 
 def _hmac_sha1(key, msg):
-    ctx = hmac.new(key, msg, hashlib.sha1)
+    ctx = hmac.new(key.encode(), msg.encode(), hashlib.sha1)
     return ctx.hexdigest()
 
 
@@ -61,9 +64,12 @@ def validateParams(sigDicts,sKey):
     '''
     if DUO_PREFIX != sigDicts['prefix']:
         return False
-    cookie = '%s|%s' %(DUO_PREFIX,base64.b64encode('|'.join(sigDicts['content'])))
-    newSig = _hmac_sha1(sKey.encode('utf-8'),cookie)
-    if _hmac_sha1(sKey.encode('utf-8'),newSig) != _hmac_sha1(sKey.encode('utf-8'),sigDicts['sha_1']):
+
+    contentStr = ('|'.join(sigDicts['content'])).encode()
+    cookie = '%s|%s' %(DUO_PREFIX, base64.b64encode(contentStr).decode())
+    newSig = _hmac_sha1(sKey, cookie)
+
+    if _hmac_sha1(sKey, newSig) != _hmac_sha1(sKey, sigDicts['sha_1']):
         return False
     return True
 
@@ -73,7 +79,7 @@ def checkUserEnrolled(userName,account):
     '''
     try:
         user = account.user_set.get(user_name=userName)
-    except User.DoesNotExist,e:
+    except User.DoesNotExist as e:
         return None
     return user
 
@@ -103,13 +109,13 @@ def _parse_vals(key, val, prefix, ikey):
 
     decoded = base64.b64decode(u_b64).decode('utf-8')
     user, u_ikey, exp = decoded.split('|')
-    print user,u_ikey,exp
+    print(user, u_ikey, exp)
 
     if u_ikey != ikey:
         return None
 
     if ts >= int(exp):
-        print 'time false'
+        print('time false')
         return None
 
     return user

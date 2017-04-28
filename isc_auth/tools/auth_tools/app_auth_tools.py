@@ -4,7 +4,7 @@ import base64
 import random
 from Crypto.Cipher import AES
 import qrcode
-import cStringIO
+from io import StringIO
 import json
 
 
