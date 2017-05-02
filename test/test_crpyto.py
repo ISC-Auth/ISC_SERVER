@@ -12,7 +12,7 @@ choice = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
 
 def createRandomFields(size):
     ret = []
-    for i in xrange(size):
+    for i in range(size):
         ret.append(random.choice(choice))
     return ''.join(ret)
 

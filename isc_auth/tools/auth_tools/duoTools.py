@@ -89,8 +89,10 @@ def signResponse(sigDicts,sKey):
     返回response的参数值，更新expiretime,prefix
     '''
     sigDicts['content'][-1] = str(int(time.time()) + EXPIRETIME)
-    cookie = '%s|%s' % (AUTH_PREFIX,base64.b64encode('|'.join(sigDicts['content'])))
-    newSig = _hmac_sha1(sKey.encode('utf-8'),cookie)
+
+    contentStr = ('|'.join(sigDicts['content'])).encode()
+    cookie = '%s|%s' % (AUTH_PREFIX,base64.b64encode(contentStr).decode())
+    newSig = _hmac_sha1(sKey,cookie)
     return '%s|%s' %(cookie,newSig)
 
 def _parse_vals(key, val, prefix, ikey):

@@ -10,7 +10,7 @@ from isc_auth.tools.auth_tools.app_auth_tools import decrypt_json_to_object
 def createRandomFields(size):
     choice = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
     ret = []
-    for i in xrange(size):
+    for i in range(size):
         ret.append(random.choice(choice))
     return ''.join(ret)
 
@@ -22,14 +22,14 @@ def del_chanell_session(message,*sessions):
 
 
 def get_session_from_group(group_name,session=None):
-    channel_list = get_channel_layer().group_channels(group_name).keys()
+    channel_list = list(get_channel_layer().group_channels(group_name).keys())
     sessions = session_for_reply_channel(channel_list[0])
     if session is not None:
         sessions = sessions.get(session,None)
     return sessions
 
 def get_session_from_channels(channels_list,session=None):
-    channel_list = channels_list.keys()
+    channel_list = list(channels_list.keys())
     sessions = session_for_reply_channel(channel_list[0])
     if session is not None:
         sessions = sessions.get(session,None)
