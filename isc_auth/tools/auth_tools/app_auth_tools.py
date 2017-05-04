@@ -4,7 +4,7 @@ import base64
 import random
 from Crypto.Cipher import AES
 import qrcode
-import cStringIO
+from io import BytesIO
 import json
 
 
@@ -22,7 +22,7 @@ REQUIRE_INFO_COMMAND = "REQUIRE"
 def createRandomFields(size):
     choice = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
     ret = []
-    for i in xrange(size):
+    for i in range(size):
         ret.append(random.choice(choice))
     return ''.join(ret)
 
@@ -44,22 +44,21 @@ def gen_b64_encrypt_explicit_auth_code(key,data=None):
         'random':random_number,
         'data':data
     })
-    return random_number,base64.b64encode(encrypt(key,cookie))
+    return random_number,base64.b64encode(encrypt(key,cookie)).decode()
 
 
-def gen_random_and_code(prefix,data=None):
+def gen_b64_random_and_code(key,prefix,data=None):
     '''
-    生成服务器认证码,未加密以及base64编码,返回认证码（随机20字节）
+    生成服务器认证码,未加密以及  base64编码,返回认证码（随机20字节）
     '''
     random_number = createRandomFields(20)
 
     cookie = prefix
     if data is not None:
         cookie += "\0%s" %(data)    
-    cookie += "\0%s" %(random_number)   
-    return random_number,cookie
-    # e = encrypt(key,cookie)
-    # return random_number,base64.b64encode(e)
+    cookie += "\0%s" %(random_number)
+    e = encrypt(key,cookie)
+    return random_number,base64.b64encode(e).decode()
 
 def decrypt_json_to_object(e,key):
     '''
@@ -94,16 +93,16 @@ def generate_captcha(api_hostname,identifer,dKey):
     生成验证码
     '''
     content = "Auth://{b64_key}-{b64_device_identifier}-{b64_api_hostname}"
-    b64_device = base64.b64encode(identifer)
-    b64_key = base64.b64encode(dKey)
-    b64_api_hostname = base64.b64encode(api_hostname)
+    b64_device = base64.b64encode(identifer.encode()).decode()
+    b64_key = base64.b64encode(dKey.encode()).decode()
+    b64_api_hostname = base64.b64encode(api_hostname.encode()).decode()
     content = content.format(b64_key=b64_key,b64_device_identifier=b64_device,b64_api_hostname=b64_api_hostname)
     qr = qrcode.QRCode(version=1,box_size=3)
     qr.add_data(content)
     img = qr.make_image()
-    buffer = cStringIO.StringIO()
+    buffer = BytesIO()
     img.save(buffer,format="JPEG")
-    return base64.b64encode(buffer.getvalue())
+    return base64.b64encode(buffer.getvalue()).decode()
 
 def generate_aes_key():
     '''
@@ -112,7 +111,7 @@ def generate_aes_key():
     return createRandomFields(32)
 
 def base64_encrypt(key,text):
-    return base64.b64encode(encrypt(key,text))
+    return base64.b64encode(encrypt(key,text)).decode()
 
 def encrypt(key,text):
     cryptor = AES.new(key,AES.MODE_CBC,b'0000000000000000')
@@ -135,7 +134,7 @@ def encrypt(key,text):
 def decrypt(key,text):
     cryptor = AES.new(key,AES.MODE_CBC,b'0000000000000000')
     plain_text  = cryptor.decrypt(text)
-    return plain_text.rstrip('\0')
+    return plain_text.decode().rstrip('\0')
 
 
 

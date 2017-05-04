@@ -14,7 +14,7 @@ def explicit_auth_message_handle(message,api_hostname,identifer):
         message.reply_channel.send({"text":"{'info':'The explicit auth is timeout'}"})
     try:
         prefix, = app_auth_tools.validate_info(message.content["text"]["info"],random)
-    except Exception,e:
+    except Exception as e:
         raise e
         message.reply_channel.send({"close":True})
     else:

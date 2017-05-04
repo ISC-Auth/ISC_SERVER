@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 import random
-from tools.uniform_tools import createRandomFields
+from isc_auth.tools.uniform_tools import createRandomFields
 import pyotp
 
 

@@ -24,7 +24,7 @@ class SMS_Call_Tool(object):
         t = time.strftime("%Y%m%d%H%M%S",time.localtime(time.time()))
         sig = SMS_Call_Tool.sig.format(id=SMS_Call_Tool.account_sid,token=SMS_Call_Tool.token,time=t)
         md5 = hashlib.md5()
-        md5.update(sig)
+        md5.update(sig.encode())
         sig = md5.hexdigest().upper()
         function = ''
         operation = ''
@@ -41,7 +41,7 @@ class SMS_Call_Tool(object):
         function=function,operation=operation,SigParameter=sig)
         
         authorization = SMS_Call_Tool.authorization.format(id=SMS_Call_Tool.account_sid,time=t)
-        authorization_64 = base64.b64encode(authorization)
+        authorization_64 = base64.b64encode(authorization.encode()).decode()
         headers = {
             'Accept':'application/json',
             'Content-Type':'application/json;charset=utf-8',
