@@ -9,7 +9,9 @@ from isc_auth.tools.uniform_tools import *
 from .models import Device
 from django.db.models import Empty
 
-
+WIFI_REPLY_NOSTATE = 0b0
+WIFI_REPLY_MOBILE_ACCEPT = 0b1
+WIFI_REPLY_PC_ACCEPT = 0b10
 
    
 @channel_session
@@ -100,7 +102,24 @@ def auth_message_handle(message,api_hostname,identifer):
         Group("device-%s-%s" %(identifer,api_hostname)).add(message.reply_channel)
 
 
-    
+@channel_session
+def sync_wifi_state_handle(message, api_hostname, identifer):
+    source = message.content["text"]["source"]
+    result = message.content["text"]["result"]
 
-        
-        
+    state = cache.get("user-%s-%s_wifistate" %(identifer, api_hostname), WIFI_REPLY_NOSTATE)
+
+    if result == "deny" or source == "mobile" and state == WIFI_REPLY_MOBILE_ACCEPT or source == "pc" and state == WIFI_REPLY_PC_ACCEPT:
+        #任一端拒绝或者单端重复发包，重置状态并返回暂停包
+        Group("device-%s-%s" %(identifer, api_hostname)).send({"text": ""})
+
+        state = WIFI_REPLY_NOSTATE
+        cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), state, 1)
+    else:
+        if source == "mobile":
+            state = state | WIFI_REPLY_MOBILE_ACCEPT
+        elif source == "pc":
+            state = state | WIFI_REPLY_PC_ACCEPT
+
+        cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), state)
+
