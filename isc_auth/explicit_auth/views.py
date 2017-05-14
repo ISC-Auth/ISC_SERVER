@@ -19,6 +19,7 @@ import json,time,random,base64
 import pyotp
 import time
 
+from isc_auth.tools.auth_tools.timer import setTimer
 
 '''
 接受request，request data为tx,parent
@@ -328,7 +329,18 @@ def auth(request,api_hostname,identifer):
 ##
 
 
+def timertest(request):
 
+    printcontent = "here"
+
+    deadline = time.time() + 3
+
+    def printline():
+        print(printcontent)
+
+    setTimer(deadline, printline)
+
+    return HttpResponse("timer start!")
 
 
 
