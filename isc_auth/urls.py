@@ -20,7 +20,7 @@ explicit_auth_urlpatterns = [
     url(url_hostname_identifer %'text_auth',explicit_auth.views.sms_call_auth,name='text_auth'), 
     url(url_hostname_identifer %'app_code_auth',explicit_auth.views.random_code_auth,name='app_code_auth'),     
     # url(r'test_frontend',explicit_auth.views.test_front_end,name="test_frontend"),
-    url('timertest', explicit_auth.views.timertest),
+    url(url_hostname_identifer %'pctest', explicit_auth.views.pctest),
 ]
 
 

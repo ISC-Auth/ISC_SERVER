@@ -329,32 +329,11 @@ def auth(request,api_hostname,identifer):
 ##
 
 
-def timertest(request):
+def pctest(request, api_hostname, identifer):
 
-    printcontent = "here"
+    key = createRandomFields(40)
+    cache.set("device-%s-%s_pc_key" %(identifer,api_hostname), key)
 
-    deadline = time.time() + 3
+    url = "iscauth://%s-%s-%s" % (identifer, api_hostname, key)
 
-    def printline():
-        print(printcontent)
-
-    setTimer(deadline, printline)
-
-    return HttpResponse("timer start!")
-
-
-
-
-        
-
-
-
-    
-        
-    
-
-
-    
-    
-    
-    
+    return HttpResponse(url)

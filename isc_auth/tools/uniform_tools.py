@@ -43,7 +43,6 @@ def multiplex_auth(message,channel):
     payload['text'] = message.content['text']
     Channel(channel).send(payload)
 
-
 def multiplex(message,channel):
     try:
         content = decrypt_json_to_object(message.content['text'],message['key'])
@@ -52,6 +51,23 @@ def multiplex(message,channel):
         message.reply_channel.send({"close":True})
         return
     
+    action = content.get("action","")
+    payload = {}
+    payload['reply_channel'] = message.content['reply_channel']
+    payload['path'] = message.content['path']
+    #content为python字典
+    payload['text'] = content
+    payload['action'] = action
+    Channel(channel).send(payload)
+
+def pc_multiplex(messsage, channel):
+    try:
+        content = json.loads(message.content['text'])
+    except:
+        message.reply_channel.send({"text":"Your data format should be json"})
+        message.reply_channel.send({"close":True})
+        return
+
     action = content.get("action","")
     payload = {}
     payload['reply_channel'] = message.content['reply_channel']
