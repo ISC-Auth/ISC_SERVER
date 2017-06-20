@@ -142,8 +142,6 @@ def pc_auth_message_handle(message, api_hostname, identifer, device_type):
     random_trans = duoTools._hmac_sha1(key, random)
 
     jsondata = json.loads(message.content['text'])
-    print(random_trans)
-    print(jsondata['random'])
 
     if jsondata['random'] == random_trans:
         message.channel_session['auth'] = True

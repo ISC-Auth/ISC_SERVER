@@ -17,12 +17,11 @@ def start_wifi_collect(api_hostname, identifer):
 	start_seq = 1
 	time_step = SCAN_STEP
 
-	content_encrypt = app_auth_tools.base64_encrypt(key, json.dumps({
+	content_encrypt = json.dumps({
 			"type": "start_wifi_collect",
 			"start_time": start_time,
-			"start_seq": start_seq,
-			"time_step": time_step
-		}))
+			"start_seq": start_seq
+		})
 
 	cache.set("user-%s-%s_wifi_start_time" %(identifer, api_hostname), start_time)
 	cache.set("user-%s-%s_wifi_start_seq" %(identifer, api_hostname), start_seq)

@@ -20,13 +20,13 @@ general_routing = [
 
 custom_routing = [
     #mobile websocket连接建立认证
-    route("auth_message.receive",auth_message_handle,path=websocket_path, device_type='mobile'),
+    route("auth_message.receive",auth_message_handle,path=websocket_path),
     #mobile显示认证
     route("message.receive",explicit_auth_message_handle,path=websocket_path, action=EXPLICIT_REPLY_COMMAND),
     route("message.receive",send_account_info_handle,path=websocket_path, action=REQUIRE_INFO_COMMAND),
 
     #pc websocket连接建立认证
-    route("pc_auth_message.receive", consumers.pc_auth_message_handle, path=websocket_path, device_type='pc'),
+    route("pc_auth_message.receive", consumers.pc_auth_message_handle, path=websocket_path),
     #wifi相关
     route("message.receive", consumers.wifi_reply_handle, path=websocket_path, action=WIFI_REPLY_COMMAND),
     route("message.receive", consumers.wifi_data_handle, path=websocket_path, action=WIFI_DATA_COMMAND),

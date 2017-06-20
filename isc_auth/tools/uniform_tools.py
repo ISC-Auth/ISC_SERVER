@@ -60,7 +60,7 @@ def multiplex(message,channel):
     payload['action'] = action
     Channel(channel).send(payload)
 
-def pc_multiplex(messsage, channel):
+def pc_multiplex(message, channel):
     try:
         content = json.loads(message.content['text'])
     except:

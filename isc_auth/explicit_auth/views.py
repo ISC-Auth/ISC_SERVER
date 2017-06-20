@@ -332,7 +332,7 @@ def auth(request,api_hostname,identifer):
 def pctest(request, api_hostname, identifer):
 
     key = createRandomFields(40)
-    cache.set("device-%s-%s_pc_key" %(identifer,api_hostname), key)
+    cache.set("device-%s-%s_pc_key" %(identifer,api_hostname), key, 60)
 
     url = "iscauth://%s-%s-%s" % (identifer, api_hostname, key)
 
