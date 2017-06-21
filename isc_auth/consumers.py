@@ -79,7 +79,6 @@ def ws_message(message,api_hostname,identifer, device_type):
         else:
             multiplex_auth(message,"auth_message.receive")
     elif device_type == 'pc':
-        print("asdfasdfasdfadfasdfadfa")
         if message.channel_session['auth']:
             pc_multiplex(message, "message.receive")
         else:
@@ -144,8 +143,6 @@ def pc_auth_message_handle(message, api_hostname, identifer, device_type):
 
     jsondata = json.loads(message.content['text'])
 
-    print("2333333")
-
     if jsondata['random'] == random_trans:
         message.channel_session['auth'] = True
         message.reply_channel.send({"text": "OK"})
@@ -183,3 +180,8 @@ def wifi_reply_handle(message, api_hostname, identifer):
 def wifi_data_handle(message, api_hostname, identifer):
     # 数据包处理
     print("wifi_data_handle not implemented")
+
+
+@channel_session
+def illegal_connection_handle(message):
+    message.reply_channel.send({"close":True})
