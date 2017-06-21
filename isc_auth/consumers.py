@@ -152,7 +152,7 @@ def pc_auth_message_handle(message, api_hostname, identifer, device_type):
 
 
 @channel_session
-def wifi_reply_handle(message, api_hostname, identifer):
+def wifi_reply_handle(message, api_hostname, identifer, device_type):
     source = message.content["text"]["source"]
     result = message.content["text"]["result"]
     seq = message.content["text"]["seq"]
@@ -177,7 +177,7 @@ def wifi_reply_handle(message, api_hostname, identifer):
             cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), state)
 
 @channel_session
-def wifi_data_handle(message, api_hostname, identifer):
+def wifi_data_handle(message, api_hostname, identifer, device_type):
     # 数据包处理
     print("wifi_data_handle not implemented")
 
