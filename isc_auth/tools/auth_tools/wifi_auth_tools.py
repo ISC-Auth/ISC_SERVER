@@ -1,10 +1,10 @@
 from isc_auth.tools.auth_tools import app_auth_tools
 from channels import Group
 from django.core.cache import cache
+from channels.asgi import get_channel_layer
 
 from isc_auth.models import Device
 import json
-from isc_auth.consumers import WIFI_REPLY_NOSTATE, WIFI_REPLY_MOBILE_ACCEPT, WIFI_REPLY_PC_ACCEPT
 
 import time
 from isc_auth.tools.auth_tools.timer import setTimer
@@ -30,15 +30,18 @@ def start_wifi_collect(api_hostname, identifer):
 	cache.set("user-%s-%s_wifi_start_time" %(identifer, api_hostname), start_time)
 	cache.set("user-%s-%s_wifi_start_seq" %(identifer, api_hostname), start_seq)
 
-	cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), WIFI_REPLY_NOSTATE)
+	cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
+	cache.set("user-%s-%s_wifistate_state" %(identifer, api_hostname), False)
 	def check_state():
-		state = cache.get("user-%s-%s_wifistate" %(identifer, api_hostname), WIFI_REPLY_NOSTATE)
+		state_pc = cache.get("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
+        state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
 
-		if state == WIFI_REPLY_NOSTATE:
+		if not (state_pc and state_mobile):
 			# 有任一段未到或拒绝
 			# 处理策略未定
 			print("Wifi collect starting failed.")
 
 	setTimer(start_time + SCAN_TIME, check_state)
 
+	print(get_channel_layer().group_channels("device-%s-%s" %(identifer, api_hostname)).__len__())
 	Group("device-%s-%s" %(identifer, api_hostname)).send({"text": content_encrypt})

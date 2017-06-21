@@ -14,7 +14,6 @@ websocket_path = r"^/api-(?P<api_hostname>[a-zA-Z0-9]+)/(?P<identifer>[a-zA-Z0-9
 
 general_routing = [
     route("websocket.connect",ws_connect,path=websocket_path),
-    route("websocket.connect", consumers.illegal_connection_handle),
     route("websocket.receive",ws_message,path=websocket_path),
     route("websocket.disconnect",ws_disconnect,path=websocket_path), 
 ]
@@ -33,7 +32,7 @@ custom_routing = [
     route("message.receive", consumers.wifi_data_handle, path=websocket_path, action=WIFI_DATA_COMMAND),
 
     #其余关闭
-    route("message.receive",consumers.illegal_connection_handle),
+    route("message.receive", null_consumer),
 
     #计时器
     route("timer", timer.run),
