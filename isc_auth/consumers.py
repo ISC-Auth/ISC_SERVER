@@ -13,7 +13,7 @@ WIFI_REPLY_NOSTATE = 0b0
 WIFI_REPLY_MOBILE_ACCEPT = 0b1
 WIFI_REPLY_PC_ACCEPT = 0b10
 
-   
+
 @channel_session
 def ws_connect(message,api_hostname,identifer, device_type):
     message.reply_channel.send({'accept':True})
@@ -35,7 +35,7 @@ def ws_connect(message,api_hostname,identifer, device_type):
                     return
                 else:
                     key = key.dKey
-     
+
         random_number,code = app_auth_tools.gen_b64_random_and_code(key,app_auth_tools.CONNECTION_SETUP_PREFIX)
 
         message.channel_session["key"] = key
@@ -51,7 +51,7 @@ def ws_connect(message,api_hostname,identifer, device_type):
             random_number = createRandomFields(20)
 
             code = json.dumps({
-                "type": app_auth_tools.CONNECTION_SETUP_PREFIX,
+                "type": app_auth_tools.CONNECTION_SETUP_PREFIX,  #SYN
                 "random": random_number
             })
 
@@ -79,6 +79,7 @@ def ws_message(message,api_hostname,identifer, device_type):
         else:
             multiplex_auth(message,"auth_message.receive")
     elif device_type == 'pc':
+        print("asdfasdfasdfadfasdfadfa")
         if message.channel_session['auth']:
             pc_multiplex(message, "message.receive")
         else:
@@ -143,6 +144,8 @@ def pc_auth_message_handle(message, api_hostname, identifer, device_type):
 
     jsondata = json.loads(message.content['text'])
 
+    print("2333333")
+
     if jsondata['random'] == random_trans:
         message.channel_session['auth'] = True
         message.reply_channel.send({"text": "OK"})
@@ -180,4 +183,3 @@ def wifi_reply_handle(message, api_hostname, identifer):
 def wifi_data_handle(message, api_hostname, identifer):
     # 数据包处理
     print("wifi_data_handle not implemented")
-

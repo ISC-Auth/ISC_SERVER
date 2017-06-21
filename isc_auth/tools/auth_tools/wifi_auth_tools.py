@@ -1,16 +1,20 @@
-from isc_auth.tools import app_auth_tools
+from isc_auth.tools.auth_tools import app_auth_tools
 from channels import Group
 from django.core.cache import cache
 
-from .models import Device
+from isc_auth.models import Device
 import json
 from isc_auth.consumers import WIFI_REPLY_NOSTATE, WIFI_REPLY_MOBILE_ACCEPT, WIFI_REPLY_PC_ACCEPT
 
 import time
 from isc_auth.tools.auth_tools.timer import setTimer
 
+START_TIME=10;
+SCAN_STEP = 20;
+SCAN_TIME = 9;
+
 def start_wifi_collect(api_hostname, identifer):
-	device = Device.objects.get(identifier = identifer)
+	device = Device.objects.get(identifer = identifer)
 	key = device.dKey
 
 	start_time = time.time() + START_TIME

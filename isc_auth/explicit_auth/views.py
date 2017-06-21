@@ -13,6 +13,7 @@ from isc_auth.tools.uniform_tools import get_session_from_channels,createRandomF
 
 from isc_auth.models import Application,Account,User,Device
 from isc_auth.tools.auth_tools import app_auth_tools,duoTools,text_mobile_tools
+from isc_auth.tools.auth_tools.wifi_auth_tools import start_wifi_collect
 
 
 import json,time,random,base64
@@ -100,7 +101,7 @@ def enroll(request,api_hostname):
     if request.method == 'GET':
         return render(request,'explicit_auth/explicit_auth/frame.html',{
             'api_hostname':api_hostname,
-            'identifer':'0'*20,            
+            'identifer':'0'*20,
             'has_enrolled':"false"
             })
 
@@ -117,7 +118,7 @@ def enroll(request,api_hostname):
         auth_code = ''
         for i in range(6):
             auth_code += random.choice(pre_choices)
-        #发送请求      
+        #发送请求
         wait_time = 2
         tool.action(phone,auth_code,wait_time,'sms')
         request.session['enroll_code'] = auth_code
@@ -175,7 +176,7 @@ def bind_device(request,api_hostname,identifer):
 检查设备是否绑定，不超过120秒
 '''
 def check_bind(request,api_hostname,identifer):
-    channel_layer = get_channel_layer() 
+    channel_layer = get_channel_layer()
     #每10秒检查一次socket连接,最多不超过180秒
     #300
     for i in range(36):
@@ -219,7 +220,7 @@ def auth_redirect(request,api_hostname,identifer):
 '''
 进行SMS或电话认证
 '''
-def sms_call_auth(request,api_hostname,identifer):  
+def sms_call_auth(request,api_hostname,identifer):
     if request.method == 'GET':
         tool = text_mobile_tools.SMS_Call_Tool()
         user = User.objects.get(device__identifer=identifer)
@@ -229,7 +230,7 @@ def sms_call_auth(request,api_hostname,identifer):
         auth_code = ''
         for i in range(6):
             auth_code += random.choice(pre_choices)
-        #发送请求      
+        #发送请求
         wait_time = 2
         action_type =   request.GET['type']
         tool.action(phone,auth_code,wait_time,action_type)
@@ -275,14 +276,14 @@ def random_code_auth(request,api_hostname,identifer):
     return auth_result_common_action(request,totp.verify(random_code,time.time(),1))
 ##
 
-    
-  
+
+
 '''
 push认证中检查手机APP websocket是否连接，最多不超过60秒
 '''
 @xframe_options_exempt
 def auth_check_ws(request,api_hostname,identifer):
-    
+
     channel_layer = get_channel_layer()
     device_group_name = "device-%s-%s" %(identifer,api_hostname)
     # 每3秒检查一次socket连接,最多不超过60秒
@@ -319,7 +320,7 @@ def auth(request,api_hostname,identifer):
         auth_status = cache.get("device-%s-%s_auth" %(identifer,api_hostname),None)
         # 未收到认证信息
         if auth_status is None:
-            time.sleep(3)       
+            time.sleep(3)
         else:
             cache.set("device-%s-%s_auth" %(identifer,api_hostname), None, 1)
             return auth_result_common_action(request,auth_status)
@@ -336,4 +337,9 @@ def pctest(request, api_hostname, identifer):
 
     url = "iscauth://%s-%s-%s" % (identifer, api_hostname, key)
 
+    return HttpResponse(url)
+
+def startwificollect(request, api_hostname, identifer):
+    start_wifi_collect(api_hostname,identifer)
+    url = "iscauth://%s-%s" % (identifer, api_hostname)
     return HttpResponse(url)
