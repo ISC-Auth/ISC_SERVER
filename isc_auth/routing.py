@@ -32,7 +32,7 @@ custom_routing = [
     route("message.receive", consumers.wifi_data_handle, path=websocket_path, action=WIFI_DATA_COMMAND),
 
     #其余关闭
-    route("message.receive",consumers.illegal_connection_handle),
+    route("message.receive", null_consumer),
 
     #计时器
     route("timer", timer.run),
