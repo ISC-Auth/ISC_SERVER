@@ -15,7 +15,6 @@ from isc_auth.models import Application,Account,User,Device
 from isc_auth.tools.auth_tools import app_auth_tools,duoTools,text_mobile_tools
 from isc_auth.tools.auth_tools.wifi_auth_tools import start_wifi_collect
 
-
 import json,time,random,base64
 import pyotp
 import time
@@ -341,5 +340,5 @@ def pctest(request, api_hostname, identifer):
 
 def startwificollect(request, api_hostname, identifer):
     start_wifi_collect(api_hostname,identifer)
-    url = "iscauth://%s-%s" % (identifer, api_hostname)
+    url = "iscauth://%s-%s-%s" % (identifer, api_hostname,time.asctime( time.localtime(time.time())))
     return HttpResponse(url)

@@ -3,7 +3,8 @@ from channels import Group,Channel
 from channels.sessions import channel_session
 from django.core.cache import cache
 
-import json
+import json,time
+from queue import Queue
 from isc_auth.tools.auth_tools import app_auth_tools, duoTools
 from isc_auth.tools.uniform_tools import *
 from .models import Device
@@ -13,6 +14,7 @@ WIFI_REPLY_NOSTATE = 0b0
 WIFI_REPLY_MOBILE_ACCEPT = 0b1
 WIFI_REPLY_PC_ACCEPT = 0b10
 
+globalVar = globals()
 
 @channel_session
 def ws_connect(message,api_hostname,identifer, device_type):
@@ -110,7 +112,9 @@ def send_account_info_handle(message,api_hostname,identifer):
         "text":content_encrypt
     })
 
-
+@channel_session
+def illegal_connection_handle(message):
+    message.reply_channel.send({"close":True})
 
 @channel_session
 def auth_message_handle(message,api_hostname,identifer):
@@ -157,31 +161,74 @@ def wifi_reply_handle(message, api_hostname, identifer, device_type):
     result = message.content["text"]["result"]
     seq = message.content["text"]["seq"]
 
-    start_seq = cache.get("user-%s-%s_wifistate" %(identifer, api_hostname), 0)
+    start_seq = cache.get("user-%s-%s_wifi_start_seq" %(identifer, api_hostname), 0)
+
+    print("+++ source ++++"+source+"++++ seq ++  "+str(seq)+"  +++ start seq ++ "+str(start_seq))
     if start_seq == seq:
 
-        state = cache.get("user-%s-%s_wifistate" %(identifer, api_hostname), WIFI_REPLY_NOSTATE)
+        state_pc = cache.get("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
+        state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
 
-        if result == "deny" or source == "mobile" and state == WIFI_REPLY_MOBILE_ACCEPT or source == "pc" and state == WIFI_REPLY_PC_ACCEPT:
+        if result == "deny" or source == "mobile" and state_mobile == True   or source == "pc" and state_pc == True:
             #任一端拒绝或者单端重复发包，重置状态并返回暂停包
             Group("device-%s-%s" %(identifer, api_hostname)).send({"text": ""})
 
             state = WIFI_REPLY_NOSTATE
-            cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), state, 1)
+            cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
+            cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
         else:
             if source == "mobile":
-                state = state | WIFI_REPLY_MOBILE_ACCEPT
+                cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), True)
             elif source == "pc":
-                state = state | WIFI_REPLY_PC_ACCEPT
-
-            cache.set("user-%s-%s_wifistate" %(identifer, api_hostname), state)
+                cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), True)
 
 @channel_session
 def wifi_data_handle(message, api_hostname, identifer, device_type):
-    # 数据包处理
-    print("wifi_data_handle not implemented")
+    # 数据包处理 创建两个队列 PC端和mobile端
+    print(time.asctime( time.localtime(time.time())))
+    #print("wifi_data_handle not implemented")
 
+    data = message.content["text"]
+    source = data["source"]
+    seq = data["seq"]
 
-@channel_session
-def illegal_connection_handle(message):
-    message.reply_channel.send({"close":True})
+    state_pc = cache.get("user-%s-%s_wifistate_pc" %(identifer, api_hostname), None)
+    state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), None)
+
+    if state_pc == True and state_mobile == True :
+        if source == "mobile":
+            if 'wifi_data_mb_'+identifer in globals().keys():
+                print("-------mobile--------")
+            else:
+                globalVar['wifi_data_mb_'+identifer] = Queue()
+
+            globalVar['wifi_data_mb_'+identifer].put(data)
+            print("--mb----"+identifer+"----------"+str(data["seq"])+"---")
+
+        elif source == "pc":
+            if 'wifi_data_pc_'+identifer in globals().keys():
+                print("---------pc---------")
+            else:
+                globalVar['wifi_data_pc_'+identifer] = Queue()
+
+            globalVar['wifi_data_pc_'+identifer].put(data)
+            print("--pc----"+identifer+"----------"+str(data["seq"])+"---")
+
+def wifi_data_check(api_hostname,identifer):
+    state_pc = cache.get("user-%s-%s_wifistate_pc" %(identifer, api_hostname), None)
+    state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), None)
+    if state_pc == True and state_mobile == True :
+        if 'wifi_data_mb_'+identifer in globals().keys() and 'wifi_data_pc_'+identifer in globals().keys():
+            if not(globalVar['wifi_data_mb_'+identifer].empty() or globalVar['wifi_data_pc_'+identifer].empty()):
+                data_pc = globalVar['wifi_data_pc_'+identifer].get()
+                data_mb = globalVar['wifi_data_mb_'+identifer].get()
+
+                print("(mb,"+identifer+","+str(data_mb["seq"])+")")
+                print("(PC,"+identifer+","+str(data_pc["seq"])+")")
+                if data_pc['seq'] == data_mb['seq']:
+                    return  True
+
+    cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
+    cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
+    time.sleep(2)
+    return False

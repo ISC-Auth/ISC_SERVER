@@ -5,7 +5,7 @@ from django.core.cache import cache
 from isc_auth.tools.auth_tools import app_auth_tools
 
 @channel_session
-def explicit_auth_message_handle(message,api_hostname,identifer):
+def explicit_auth_message_handle(message,api_hostname,identifer,device_type):
     '''
     处理APP的显示认证回传信息
     '''
