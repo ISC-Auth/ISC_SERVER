@@ -10,7 +10,6 @@ from isc_auth.tools.auth_tools.timer import setTimer
 from isc_auth.consumers import wifi_data_check
 
 START_TIME=10
-SCAN_STEP = 5
 SCAN_TIME = 9
 globalVar = globals()
 global check_time
@@ -21,7 +20,6 @@ def start_wifi_collect(api_hostname, identifer):
 
 	start_time = time.time() + START_TIME
 	start_seq = 1
-	print(time.asctime( time.localtime(time.time())))
 
 	content_encrypt = json.dumps({
 			"type": "start_wifi_collect",
@@ -43,15 +41,14 @@ def start_wifi_collect(api_hostname, identifer):
 			Group("device-%s-%s" %(identifer, api_hostname)).send({"text": ""})
 			print("Wifi collect starting failed.")
 		else:
-			global check_time
-			print(str(time.ctime(check_time))+'===== now ======')
-			check_time += SCAN_TIME
-			print(str(time.ctime(check_time))+'===== next ======')
-			setTimer(check_time, check_state)
+			cache.set("user-%s-%s_wifi_current_seq" %(identifer, api_hostname), start_seq + 1)
 
-	global check_time
-	check_time = start_time + SCAN_TIME+ SCAN_STEP
-	print(str(time.ctime(check_time))+'   check_time_1')
+			check_time = start_time + SCAN_TIME * 2
+
+			def wifi_data_check_closure():
+				wifi_data_check(api_hostname, identifer)
+
+			setTimer(check_time, wifi_data_check_closure)
 
 	setTimer(start_time + SCAN_TIME, check_state)
 	Group("device-%s-%s" %(identifer, api_hostname)).send({"text": content_encrypt})

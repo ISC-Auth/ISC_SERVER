@@ -225,7 +225,19 @@ def wifi_data_check(api_hostname,identifer):
 
                 print("(mb,"+identifer+","+str(data_mb["seq"])+")")
                 print("(PC,"+identifer+","+str(data_pc["seq"])+")")
-                if data_pc['seq'] == data_mb['seq']:
+
+                current_seq = cache.get("user-%s-%s_wifi_current_seq" %(identifer, api_hostname), 0)
+                start_seq = cache.get("user-%s-%s_wifi_start_seq" %(identifer, api_hostname), 0)
+                start_time = cache.get("user-%s-%s_wifi_start_time" %(identifer, api_hostname), None)
+                if data_pc['seq'] == data_mb['seq'] and current_seq == data_pc['seq']:
+                    cache.set("user-%s-%s_wifi_current_seq" %(identifer, api_hostname), current_seq + 1)
+
+                    check_time = (current_seq - start_seq + 1) * SCAN_TIME + start_time
+
+                    def wifi_data_check_closure():
+                        wifi_data_check(api_hostname, identifer)
+
+                    setTimer(check_time, wifi_data_check_closure)
                     return  True
 
     cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
