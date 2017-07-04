@@ -9,6 +9,7 @@ from isc_auth.tools.auth_tools import app_auth_tools, duoTools
 from isc_auth.tools.uniform_tools import *
 from .models import Device
 from django.db.models import Empty
+from isc_auth.tools.auth_tools.timer import setTimer
 
 WIFI_REPLY_NOSTATE = 0b0
 WIFI_REPLY_MOBILE_ACCEPT = 0b1
@@ -231,7 +232,7 @@ def wifi_data_check(api_hostname,identifer):
                 start_time = cache.get("user-%s-%s_wifi_start_time" %(identifer, api_hostname), None)
                 if data_pc['seq'] == data_mb['seq'] and current_seq == data_pc['seq']:
                     cache.set("user-%s-%s_wifi_current_seq" %(identifer, api_hostname), current_seq + 1)
-
+                    SCAN_TIME = cache.get("user-%s-%s_wifi_scan_time" %(identifer, api_hostname), None)
                     check_time = (current_seq - start_seq + 1) * SCAN_TIME + start_time
 
                     def wifi_data_check_closure():

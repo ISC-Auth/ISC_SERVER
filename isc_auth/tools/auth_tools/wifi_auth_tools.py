@@ -11,8 +11,6 @@ from isc_auth.consumers import wifi_data_check
 
 START_TIME=10
 SCAN_TIME = 9
-globalVar = globals()
-global check_time
 
 def start_wifi_collect(api_hostname, identifer):
 	device = Device.objects.get(identifer = identifer)
@@ -29,12 +27,13 @@ def start_wifi_collect(api_hostname, identifer):
 
 	cache.set("user-%s-%s_wifi_start_time" %(identifer, api_hostname), start_time)
 	cache.set("user-%s-%s_wifi_start_seq" %(identifer, api_hostname), start_seq)
+	cache.set("user-%s-%s_wifi_scan_time" %(identifer, api_hostname), SCAN_TIME)
 
 	cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
 	cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
 	def check_state():
 		state_pc = cache.get("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False)
-        state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
+		state_mobile = cache.get("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False)
 		if not (state_pc and state_mobile):
 			# 有任一段未到或拒绝
 			# 处理策略未定
@@ -44,7 +43,6 @@ def start_wifi_collect(api_hostname, identifer):
 			cache.set("user-%s-%s_wifi_current_seq" %(identifer, api_hostname), start_seq + 1)
 
 			check_time = start_time + SCAN_TIME * 2
-
 			def wifi_data_check_closure():
 				wifi_data_check(api_hostname, identifer)
 
