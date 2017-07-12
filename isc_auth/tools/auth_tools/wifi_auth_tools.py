@@ -7,7 +7,6 @@ from isc_auth.models import Device
 import json
 import time
 from isc_auth.tools.auth_tools.timer import setTimer
-from queue import Queue
 
 START_TIME=10
 SCAN_TIME = 9

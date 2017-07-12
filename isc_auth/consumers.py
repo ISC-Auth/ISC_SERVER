@@ -4,7 +4,6 @@ from channels.sessions import channel_session
 from django.core.cache import cache
 
 import json,time
-from queue import Queue
 from isc_auth.tools.auth_tools import app_auth_tools, duoTools
 from isc_auth.tools.uniform_tools import *
 from .models import Device
