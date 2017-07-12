@@ -9,7 +9,7 @@ from django.core.cache import cache
 
 from channels import Group
 from channels.asgi import get_channel_layer
-from isc_auth.tools.uniform_tools import get_session_from_channels,createRandomFields
+from isc_auth.tools.uniform_tools import get_session_from_channels, get_session_from_group, createRandomFields
 
 from isc_auth.models import Application,Account,User,Device
 from isc_auth.tools.auth_tools import app_auth_tools,duoTools,text_mobile_tools
@@ -18,6 +18,7 @@ from isc_auth.tools.auth_tools.wifi_auth_tools import start_wifi_collect
 import json,time,random,base64
 import pyotp
 import time
+import os
 
 from isc_auth.tools.auth_tools.timer import setTimer
 
@@ -163,7 +164,7 @@ def do_enroll(request,api_hostname):
 def bind_device(request,api_hostname,identifer):
     #生成二维码，秘钥并存入数据库。
     dkey = app_auth_tools.generate_aes_key()
-    print(dkey)
+    print("dkey: " + dkey)
     captcha = app_auth_tools.generate_captcha(api_hostname,identifer,dkey)
     #cache有效期设置比等待时间稍小
     cache.set("device-%s-%s_key" %(identifer,api_hostname),dkey,178)
@@ -175,16 +176,16 @@ def bind_device(request,api_hostname,identifer):
 检查设备是否绑定，不超过120秒
 '''
 def check_bind(request,api_hostname,identifer):
-    channel_layer = get_channel_layer()
     #每10秒检查一次socket连接,最多不超过180秒
     #300
     for i in range(36):
         print(i)
         group_name = "device-%s-%s" %(identifer,api_hostname)
-        device_group_list = channel_layer.group_channels(group_name)
-        if len(device_group_list)>0:
+        device_group_list = get_session_from_group(group_name, "mobile")
+        if device_group_list:
             #进行认证,数据库更新
-            key = get_session_from_channels(device_group_list,"key")
+            key = get_session_from_group(group_name, "mobile", "key")
+            print("- - " + key)
             device = Device.objects.get(identifer=identifer)
             device.dKey = key
             device.is_activated=True
@@ -287,9 +288,9 @@ def auth_check_ws(request,api_hostname,identifer):
     device_group_name = "device-%s-%s" %(identifer,api_hostname)
     # 每3秒检查一次socket连接,最多不超过60秒
     for i in range(20):
-        device_group_list = channel_layer.group_channels(device_group_name)
-        if len(device_group_list)>0:
-            key = get_session_from_channels(device_group_list,"key")
+        device_group_list = get_session_from_group(device_group_name, "mobile")
+        if device_group_list:
+            key = get_session_from_group(device_group_name, "mobile", "key")
             data = {"xxx":"xxx"}
             random,code = app_auth_tools.gen_b64_encrypt_explicit_auth_code(key,data)
             cache.set("device-%s-%s_explicit_random" %(identifer,api_hostname),random,118)
@@ -309,9 +310,9 @@ push认证，检查由channels进行websocket认证参数检查
 '''
 def auth(request,api_hostname,identifer):
     device_group_name = "device-%s-%s" %(identifer,api_hostname)
-    device_group_list = get_channel_layer().group_channels(device_group_name)
+    device_group_list = get_session_from_group(device_group_name, "mobile")
     #若连接中断
-    if len(device_group_list) == 0:
+    if device_group_list is None:
         return HttpResponse(content=json.dumps({'status':'pending','seq':request.session['seq']}))
 
     # 每3秒检查一次认证情况,最多不超过60秒
@@ -335,10 +336,16 @@ def pctest(request, api_hostname, identifer):
     cache.set("device-%s-%s_pc_key" %(identifer,api_hostname), key, 60)
 
     url = "iscauth://%s-%s-%s" % (identifer, api_hostname, key)
+    response = "<a href='%s'>link</a>" % url
 
-    return HttpResponse(url)
+    return HttpResponse(response)
 
 def startwificollect(request, api_hostname, identifer):
     start_wifi_collect(api_hostname,identifer)
-    url = "iscauth://%s-%s-%s" % (identifer, api_hostname,time.asctime( time.localtime(time.time())))
-    return HttpResponse(url)
+
+    filename = ''.join(["wifidata-", time.asctime().replace(":", "-"), ".txt"])
+    file = open(filename, "a")
+    file.close()
+
+    cache.set("device-%s-%s_current_output" %(identifer,api_hostname), filename, None)
+    return HttpResponse()
