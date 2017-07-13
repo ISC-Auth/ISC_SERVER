@@ -22,6 +22,7 @@ explicit_auth_urlpatterns = [
     # url(r'test_frontend',explicit_auth.views.test_front_end,name="test_frontend"),
     url(url_hostname_identifer %'pctest', explicit_auth.views.pctest),
     url(url_hostname_identifer %'startwificollect', explicit_auth.views.startwificollect),
+
 ]
 
 

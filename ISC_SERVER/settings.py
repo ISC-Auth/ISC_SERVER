@@ -39,13 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
+    'users',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-   # 'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -56,7 +58,8 @@ ROOT_URLCONF = 'ISC_SERVER.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['isc_auth/explicit_auth/templates/',],
+        # 'DIRS': ['isc_auth/explicit_auth/templates/',],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Shanghai' 
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -124,6 +127,45 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "common_static"),
 ]
 
+AUTH_USER_MODEL = 'users.Account'
+
+USERS_REGISTRATION_OPEN = True
+
+USERS_VERIFY_EMAIL = True
+
+USERS_AUTO_LOGIN_ON_ACTIVATION = True
+
+USERS_EMAIL_CONFIRMATION_TIMEOUT_DAYS = 1
+
+# Specifies minimum length for passwords:
+USERS_PASSWORD_MIN_LENGTH = 5
+
+# Specifies maximum length for passwords:
+USERS_PASSWORD_MAX_LENGTH = None
+
+# the complexity validator, checks the password strength
+USERS_CHECK_PASSWORD_COMPLEXITY = True
+
+USERS_SPAM_PROTECTION = False  # important!
+
+USERS_CREATE_SUPERUSER = False
+
+LOGIN_REDIRECT_URL = 'dashboard/'
+LOGIN_URL = '/login/'
+#  ---------------------------------------------------------
+#  Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '13006190035@163.com'
+EMAIL_HOST_PASSWORD = 'netease04202172'
+DEFAULT_FROM_EMAIL = '13006190035@163.com'
+#  ---------------------------------------------------------
+
+SESSION_COOKIE_AGE=60*30
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
 
 CHCHES = {

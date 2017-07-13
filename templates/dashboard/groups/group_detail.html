@@ -1,0 +1,183 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+{% include "dashboard/include.html" %}
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        {% include "dashboard/navbar.html" %}
+        <!--左侧导航结束-->
+        <!--右侧部分开始-->
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            <div class="row border-bottom">
+                {% include "dashboard/navbartop.html" %}
+            </div>
+            <div class="row J_mainContent" id="content-main">
+                <div class="gray-bg">
+                    <div class="row wrapper border-bottom white-bg page-heading  fadeInUp">
+                        <div class="col-sm-4">
+                            <h2>{{group.group_name}}</h2>
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="index.html">仪表盘</a>
+                                </li>
+                                <li>
+                                    <a href= {% url 'users' %}>组</a>
+                                </li>
+                                <li>
+                                    <strong>{{group.group_name}}</strong>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="title-action">
+                                <div class="col-sm-6">
+                                    <form class="application application-box websdk" id="remove_group_form" method="post" action="/dashboard/groups/delete/">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="gKey" id="gKey" value="{{group.gKey}}">                                               
+                                        <td class="project-actions">
+                                            <button type="button" id="remove_group" class="btn btn-danger"><i class="fa fa-close "></i> 删除组</button>
+                                        </td>
+                                    </form>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper wrapper-content animated fadeInUp">
+                        <div class="row row-lg detail_title">                    
+                            <div class="col-sm-4">
+                                <h3>详细信息</h3>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-content">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <form class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">组名</label>
+                                                <div class="col-sm-8 ">
+                                                    <input type="text" class="form-control key click_to_select_all" value="{{group.group_name}}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">组描述</label>
+                                                <div class="col-sm-8 ">
+                                                    <input type="text" class="form-control key click_to_select_all" value="{{group.group_description}}">
+                                                </div>
+                                            </div>                    
+                                            {% csrf_token %}
+                                            <!--<div class="hr-line-dashed"></div>-->
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">状态
+                                                </label>
+                                                <div class="col-sm-8">                                                    
+                                                    <div class="radio i-checks">
+                                                        <label>
+                                                            <input type="radio" checked="" value="option1" name="a"> <i></i>Active </label>
+                                                            <br/><small class="text-navy"> 需要双因素认证</small>
+                                                    </div>
+                                                    <div class="radio i-checks">
+                                                        <label>
+                                                            <input type="radio" value="option2" name="a"> <i></i>Bypass</label>
+                                                            <br/><small class="text-navy">  跳过双因素认证</small>
+                                                    </div>
+                                                    <div class="radio i-checks">
+                                                        <label>
+                                                            <input type="radio"  value="option3" name="a"> <i></i>Disabled</label>
+                                                            <br/><small class="text-navy">  拒绝请求</small>
+                                                    </div>
+                                                </div>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-3 col-sm-8">
+                                                    <button id="registerBtn" class="btn btn-sm btn-info" type="submit"><i class="fa fa-check-square-o "></i> 保存更改</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-lg detail_title">                    
+                            <div class="col-sm-4">
+                                <h3>用户</h3>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="pull-right">
+                                    <a class="btn btn-outline btn-info"><i class="fa fa-plus"></i>添加用户</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-content">
+                                <div class="row row-lg">
+                                    {% if state == 'success' %}
+                                        <div class="col-sm-12 well">
+                                            <h2 class="text-success text-center">删除成功</h2>
+                                        </div>                                  
+                                    {% endif %}
+                                    {% if messages %}  
+                                        {% for msg in messages %}  
+                                            {{ msg.message }}  
+                                        {% endfor %}  
+                                    {% endif %}                                 
+                                    <div class="col-sm-12">
+                                        <table id="exampleTablePagination" data-toggle="table" data-url= ""
+                                        data-method="get" data-pagination="true"
+                                        data-page-size=20
+                                        data-pagination="true" data-icon-size="outline" data-striped="true">
+                                                <thead>
+                                                    <tr>
+                                                        <th data-field="asset_name" data-sortable="true">用户名</th>
+                                                        <th data-field="asset_app_type" data-sortable="true">姓名</th>
+                                                        <th data-field="policy">状态/th>
+                                                        <th data-field="policy">上次登录</th>
+                                                        <th data-field=" "> </th>
+                                                    </tr>
+                                                </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--右侧部分结束-->
+    </div>
+
+    <!-- 全局js -->
+    {% include "dashboard/script.html" %}
+
+    <!-- 自定义js -->
+    <script src={% static "js/hAdmin.js" %}></script>
+
+    <!-- 第三方插件 -->
+    <script src={% static "js/plugins/pace/pace.min.js" %}></script>
+    <script>
+        $(document).ready(function () {
+            $('#remove_group').click(function () {
+                swal({
+                    title: "您确定要删除这个组吗",
+                    text: "删除后将无法恢复，请谨慎操作！",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "删除",
+                    closeOnConfirm: false
+                }, function () {
+                    $("#remove_group_form").submit();
+                    swal("删除成功！", "您已经永久删除了这个组。", "success");
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

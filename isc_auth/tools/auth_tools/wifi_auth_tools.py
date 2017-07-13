@@ -3,7 +3,7 @@ from channels import Group
 from django.core.cache import cache
 from channels.asgi import get_channel_layer
 
-from isc_auth.models import Device
+from dashboard.models import Device
 import json
 import time
 from isc_auth.tools.auth_tools.timer import setTimer
@@ -89,7 +89,7 @@ def wifi_data_check(api_hostname,identifer):
                 cache.set("user-%s-%s_wifidata_pc" %(identifer, api_hostname), data_pc_queue, None)
                 cache.set("user-%s-%s_wifidata_mobile" %(identifer, api_hostname), data_mb_queue, None)
                 return  True
-        
+
     cache.set("user-%s-%s_wifistate_mobile" %(identifer, api_hostname), False, 0)
     cache.set("user-%s-%s_wifistate_pc" %(identifer, api_hostname), False, 0)
     time.sleep(2)

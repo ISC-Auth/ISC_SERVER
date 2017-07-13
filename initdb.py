@@ -5,7 +5,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ISC_SERVER.settings")
 import django
 django.setup()
 
-from isc_auth.models import Account,Application,User,Device
+from users.models import Account
+from dashboard.models import Application,User,Device
 
 
 def init_db():
@@ -42,8 +43,3 @@ if __name__ == '__main__':
         Account.objects.get(account_email="aaa")
     except Account.DoesNotExist:
         print 'aaa'
-    
-    
-
-
-  

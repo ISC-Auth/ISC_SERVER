@@ -1,0 +1,118 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+{% include "dashboard/include.html" %}
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        {% include "dashboard/navbar.html" %}
+        <!--左侧导航结束-->
+        <!--右侧部分开始-->
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            <div class="row border-bottom">
+                {% include "dashboard/navbartop.html" %}
+            </div>
+            <div class="row J_mainContent" id="content-main">
+                 <div class="gray-bg">
+                    <div class="row wrapper border-bottom white-bg page-heading">
+                        <div class="col-sm-4">
+                            <h2>应用</h2>
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="index.html">仪表盘</a>
+                                </li>
+                                <li>
+                                    <a href= {% url 'applications' %}>应用</a>
+                                </li>
+                                <li>
+                                    <strong>添加应用</strong>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="wrapper wrapper-content animated fadeInUp">
+                        <div class="ibox">
+                            <div class="ibox-content">
+                                <div class="row m-b-sm m-t-sm">
+                                    <div class="col-md-11">
+                                        <div class="input-group">
+                                            <input type="text" placeholder="请输入应用名称或类型" class="input-sm form-control"> <span class="input-group-btn">
+                                                <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="project-list">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <form class="application application-box websdk" method="post" action=".">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="type" value="Web SDK">
+                                                <input type="hidden" name="application_name" value="Web SDK">
+                                                <td class="project-title">
+                                                    <img alt="image" class="img-circle logos" src={% static "img/logos/lock.png" %}></a>
+                                                    <a href="">Web SDK</a>
+                                                </td>
+                                                <td class="project-actions">
+                                                    <button type="submit" class="btn btn-white btn-sm"><i class="fa fa-lock "></i> 保护应用</button>
+                                                    <a href="#" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> 查看文档 </a>
+                                                </td>
+                                                </form>
+                                            </tr>
+                                            <tr>
+                                                <form class="application application-box websdk" method="post" action=".">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="type" value="LastPass">
+                                                <input type="hidden" name="application_name" value="LastPass">
+                                                <td class="project-title">
+                                                    <img alt="image" class="img-circle logos" src={% static "img/logos/lock.png" %}></a>
+                                                    <a href="">LastPass</a>
+                                                </td>
+                                                <td class="project-actions">
+                                                    <button type="submit" class="btn btn-white btn-sm"><i class="fa fa-lock "></i> 保护应用</button>
+                                                    <a href="#" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> 查看文档 </a>
+                                                </td>
+                                                </form>
+                                            </tr>
+                                            <tr>
+                                                <form class="application application-box websdk" method="post" action=".">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="type" value="WordPress">
+                                                <input type="hidden" name="application_name" value="WordPress">
+                                                <td class="project-title">
+                                                    <img alt="image" class="img-circle logos" src={% static "img/logos/lock.png" %}></a>
+                                                    <a href="">WordPress</a>
+                                                </td>
+                                                <td class="project-actions">
+                                                    <button type="submit" class="btn btn-white btn-sm"><i class="fa fa-lock "></i> 保护应用</button>
+                                                    <a href="#" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> 查看文档 </a>
+                                                </td>
+                                                </form>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        <!--右侧部分结束-->
+    </div>
+
+    <!-- 全局js -->
+    {% include "dashboard/script.html" %}
+
+    <!-- 自定义js -->
+    <script src={% static "js/hAdmin.js" %}></script>
+
+    <!-- 第三方插件 -->
+    <script src={% static "js/plugins/pace/pace.min.js" %}></script>
+
+</body>
+
+</html>

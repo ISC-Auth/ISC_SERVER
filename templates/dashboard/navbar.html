@@ -1,0 +1,65 @@
+{% load staticfiles %}
+<nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="nav-close"><i class="fa fa-times-circle"></i>
+            </div>
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="{% url 'index' %}">
+                                <span class="clear">
+                                    <span class="block m-t-xs" style="font-size:20px;">
+                                        <i class="fa fa-area-chart"></i>
+                                        <strong class="font-bold">Admin</strong>
+                                    </span>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="logo-element">Admin
+                        </div>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="{% url 'index' %}">
+                            <i class="fa fa-dashboard "></i>
+                            <span class="nav-label">仪表盘</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="{% url 'applications' %}">
+                            <i class="fa fa-anchor"></i>
+                            <span class="nav-label">应用</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="{% url 'users' %}">
+                            <i class="fa fa-users"></i>
+                            <span class="nav-label">用户</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="">
+                            <i class="fa fa-android"></i>
+                            <span class="nav-label">设备</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="{% url 'groups' %}">
+                            <i class="fa fa-users"></i>
+                            <span class="nav-label">组</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="">
+                            <i class="fa fa-bar-chart"></i> 
+                            <span class="nav-label">记录</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="">
+                            <i class="fa fa-cog"></i> 
+                            <span class="nav-label">设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>

@@ -1,0 +1,29 @@
+{% load i18n staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{% block title %}{{ title}}{% endblock %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+</head>
+<body>
+
+<div class="header navbar">
+	<div class="container">
+		<a class="navbar-brand" href="/"></a>
+	</div>
+</div>
+<div class="container">
+	{% if messages %}
+		{% for message in messages %}
+			<div class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+		{% endfor %}
+	{% endif %}
+	{% block content %}
+		
+	{% endblock content %}
+</div>
+</body>
+</html>

@@ -1,14 +1,15 @@
 #coding:utf-8
 
 from django.db import models
-from isc_auth.models import Account,Application,createRandomFields,User
+from users.models import Account
+from dashboard.models import Application,User,Device
 from isc_auth.tools.uniform_tools import createRandomFields
 
 
 import hashlib,hmac,time,qrcode,base64
 from io import StringIO
 from Crypto.Cipher import AES
- 
+
 
 
 DUO_PREFIX = 'TX'
@@ -157,23 +158,9 @@ def encrypt(key,text):
         text = text + ('\0' * add)
     ciphertext = cryptor.encrypt(text)
     return ciphertext
-     
+
     #解密后，去掉补足的空格用strip() 去掉
 def decrypt(key,text):
     cryptor = AES.new(key,AES.MODE_CBC,b'0000000000000000')
     plain_text  = cryptor.decrypt(text)
     return plain_text.rstrip('\0')
-
-
-
-
-
-
-
-
-
-    
-
-
-    
-    

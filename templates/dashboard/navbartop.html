@@ -1,0 +1,41 @@
+
+                <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                    <div class="navbar-header"><a class="navbar-minimalize minimalize-styl-2 btn btn-info " href="#"><i class="fa fa-bars"></i> </a>
+                        <form role="search" class="navbar-form-custom" method="post" action="">
+                            <div class="form-group">
+                                <input type="text" placeholder="搜索用户、应用、或设备..." class="form-control" name="top-search" id="top-search">
+                            </div>
+                        </form>
+                    </div>
+                    <ul class="nav navbar-top-links navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                <i class="fa fa-envelope fa-lg"></i> 
+                            </a>                            
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown">
+                                <i class="fa fa-user fa-lg"></i> 
+                                <span id="base_name">{{ user.account_name }}</span>
+                                <span class="fa fa-chevron-down "></span>                
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <div class="text-center link-block">
+                                        <a class="J_menuItem" href="">
+                                            <i class="fa fa-pencil-square-o"></i> <strong>编辑信息</strong>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <div class="text-center link-block">
+                                        <a class="J_menuItem"  href="{% url 'users_logout' %}">
+                                            <i class="fa fa-sign-out"></i> <strong>注销</strong>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>

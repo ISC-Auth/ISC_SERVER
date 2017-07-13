@@ -6,7 +6,7 @@ from django.core.cache import cache
 import json,time
 from isc_auth.tools.auth_tools import app_auth_tools, duoTools
 from isc_auth.tools.uniform_tools import *
-from .models import Device
+from dashboard.models import Device
 from django.db.models import Empty
 from isc_auth.tools.auth_tools.timer import setTimer
 from collections import deque

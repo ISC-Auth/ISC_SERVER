@@ -11,7 +11,9 @@ from channels import Group
 from channels.asgi import get_channel_layer
 from isc_auth.tools.uniform_tools import get_session_from_channels, get_session_from_group, createRandomFields
 
-from isc_auth.models import Application,Account,User,Device
+from users.models import Account
+from dashboard.models import Application,User,Device
+
 from isc_auth.tools.auth_tools import app_auth_tools,duoTools,text_mobile_tools
 from isc_auth.tools.auth_tools.wifi_auth_tools import start_wifi_collect
 

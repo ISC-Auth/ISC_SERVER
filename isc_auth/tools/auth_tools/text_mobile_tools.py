@@ -18,7 +18,7 @@ class SMS_Call_Tool(object):
     sig = "{id}{token}{time}"
     app_id = '4e89b79fee3c440f92ec84607b5a3468'
     templateId = '40166'
-    
+
 
     def __get_general_aug(self,action_type):
         t = time.strftime("%Y%m%d%H%M%S",time.localtime(time.time()))
@@ -36,10 +36,10 @@ class SMS_Call_Tool(object):
             operation = SMS_Call_Tool.call_operation
         else:
             raise TypeError('No such action Type')
-   
+
         url = SMS_Call_Tool.url.format(SoftVersion=SMS_Call_Tool.soft_version,accountSid=SMS_Call_Tool.account_sid,
         function=function,operation=operation,SigParameter=sig)
-        
+
         authorization = SMS_Call_Tool.authorization.format(id=SMS_Call_Tool.account_sid,time=t)
         authorization_64 = base64.b64encode(authorization.encode()).decode()
         headers = {
@@ -48,7 +48,7 @@ class SMS_Call_Tool(object):
             'Authorization':authorization_64,
         }
         return url,headers
-    
+
     def __call(self,phone_number,auth_code):
         url,headers = self.__get_general_aug('call')
         data = json.dumps({
@@ -65,7 +65,7 @@ class SMS_Call_Tool(object):
 
 
     def __send_sms(self,phone_number,auth_code,wait_time):
-        
+
         url,headers = self.__get_general_aug('sms')
         data = json.dumps({
             'templateSMS':{
@@ -77,7 +77,7 @@ class SMS_Call_Tool(object):
         })
         resp = requests.post(url=url,data=data,headers=headers)
         return resp
-    
+
     def action(self,phone_number,auth_code,wait_time,action_type):
         if action_type == 'sms':
             resp = self.__send_sms(phone_number,auth_code,wait_time)
@@ -116,6 +116,3 @@ class SMS_Call_Tool(object):
 # seed = 100
 # random.random()
 # for i in range(10):
-    
-        
-    
