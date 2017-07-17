@@ -40,8 +40,8 @@ def applications(request,args=None):
 def get_applications(request):
     '''
     get application lists
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     if request.method == "GET":
@@ -56,7 +56,7 @@ def get_applications(request):
             all_records = Application.objects.filter(account= user)   # must be wirte the line code here
 
         if sort_column:   # 判断是否有排序需求
-            sort_column = sort_column.replace('asset_', '')    
+            sort_column = sort_column.replace('asset_', '')
             if sort_column in ['app_type','name']:   # 如果排序的列表在这些内容里面
                 if order == 'desc':   # 如果排序是反向
                     sort_column = '-%s' % (sort_column)
@@ -70,23 +70,23 @@ def get_applications(request):
             limit = 20    # 默认是每页20行的内容，与前端默认行数一致
         pageinator = Paginator(all_records, limit)   # 开始做分页
 
-        page = int(int(offset) / int(limit) + 1)    
+        page = int(int(offset) / int(limit) + 1)
         response_data = {'total':all_records_count,'rows':[]}   # 必须带有rows和total这2个key，total表示总页数，rows表示每行的内容
 
 
-        for asset in pageinator.page(page):    
+        for asset in pageinator.page(page):
             response_data['rows'].append({
-                "asset_name": '<a href="/dashboard/applications/detail/?iKey=%s">%s</a>' %(asset.iKey,asset.name),  
+                "asset_name": '<a href="/dashboard/applications/detail/?iKey=%s">%s</a>' %(asset.iKey,asset.name),
                 "asset_app_type": asset.app_type if asset.app_type else "",
-            })            
-        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式  
+            })
+        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式
 
 @login_required
 def app_detail(request):
     '''
     show application detail
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     app_iKey = request.GET.get('iKey','')
@@ -103,7 +103,7 @@ def app_detail(request):
         'app' :app,
     }
     return render(request,'dashboard/applications/app_detail.html',content)
-        
+
 
 @login_required
 def add_applications(request):
@@ -120,7 +120,7 @@ def add_applications(request):
         )
         new_applications.save()
         state = 'success'
-        return HttpResponseRedirect("/dashboard/applications/detail/?iKey=%s"%(new_applications.iKey))   
+        return HttpResponseRedirect("/dashboard/applications/detail/?iKey=%s"%(new_applications.iKey))
 
     content = {
         'active_menu' : 'add_applications',
@@ -156,8 +156,8 @@ def users(request,args=None):
 def get_users(request):
     '''
     get application lists
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     if request.method == "GET":
@@ -172,7 +172,7 @@ def get_users(request):
             all_records = User.objects.filter(account= user)  # must be wirte the line code here
 
         if sort_column:   # 判断是否有排序需求
-            sort_column = sort_column.replace('asset_', '')    
+            sort_column = sort_column.replace('asset_', '')
             if sort_column in ['user_name','name','email','status','last_login']:   # 如果排序的列表在这些内容里面
                 if order == 'desc':   # 如果排序是反向
                     sort_column = '-%s' % (sort_column)
@@ -186,19 +186,19 @@ def get_users(request):
             limit = 20    # 默认是每页20行的内容，与前端默认行数一致
         pageinator = Paginator(all_records, limit)   # 开始做分页
 
-        page = int(int(offset) / int(limit) + 1)    
+        page = int(int(offset) / int(limit) + 1)
         response_data = {'total':all_records_count,'rows':[]}   # 必须带有rows和total这2个key，total表示总页数，rows表示每行的内容
 
 
         for asset in pageinator.page(page):
             response_data['rows'].append({
-                "asset_user_name": '<a href="/dashboard/users/detail/?uKey=%s">%s</a>' %(asset.uKey,asset.user_name),  
+                "asset_user_name": '<a href="/dashboard/users/detail/?uKey=%s">%s</a>' %(asset.uKey,asset.user_name),
                 "asset_name": asset.user_real_name if asset.user_real_name else "",
                 "asset_email": asset.user_email if asset.user_email else "",
                 "asset_status": asset.user_status if asset.user_status else "",
                 "asset_last_login": asset.last_login if asset.last_login else "未激活",
-            })            
-        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式  
+            })
+        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式
 
 @login_required
 def add_users(request):
@@ -216,7 +216,7 @@ def add_users(request):
             }
             return render(request,'dashboard/users/add.html',content)
         new_user = User(
-            uKey = User.new_user_key(user.api_hostname)['uKey'],
+            uKey = User.new_user_key()['uKey'],
             user_name = request.POST.get('user_name'),
             account = Account.get_account(user.api_hostname),
         )
@@ -235,8 +235,8 @@ def add_users(request):
 def users_detail(request):
     '''
     show application detail
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     uKey = request.GET.get('uKey','')
@@ -282,8 +282,8 @@ def groups(request,args=None):
 def get_groups(request):
     '''
     get application lists
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     if request.method == "GET":
@@ -298,7 +298,7 @@ def get_groups(request):
             all_records = Group.objects.filter(account= user)   # must be wirte the line code here
 
         if sort_column:   # 判断是否有排序需求
-            sort_column = sort_column.replace('asset_', '')    
+            sort_column = sort_column.replace('asset_', '')
             if sort_column in ['group_name','user_count','status']:   # 如果排序的列表在这些内容里面
                 if order == 'desc':   # 如果排序是反向
                     sort_column = '-%s' % (sort_column)
@@ -312,18 +312,18 @@ def get_groups(request):
             limit = 20    # 默认是每页20行的内容，与前端默认行数一致
         pageinator = Paginator(all_records, limit)   # 开始做分页
 
-        page = int(int(offset) / int(limit) + 1)    
+        page = int(int(offset) / int(limit) + 1)
         response_data = {'total':all_records_count,'rows':[]}   # 必须带有rows和total这2个key，total表示总页数，rows表示每行的内容
 
 
         for asset in pageinator.page(page):
             response_data['rows'].append({
-                "asset_group_name": '<a href="/dashboard/groups/detail/?gKey=%s">%s</a>' %(asset.gKey,asset.group_name),  
+                "asset_group_name": '<a href="/dashboard/groups/detail/?gKey=%s">%s</a>' %(asset.gKey,asset.group_name),
                 "asset_user_count": '0',
                 "asset_status": asset.group_status if asset.group_status else "",
                 "asset_description": asset.group_description if asset.group_description else "",
-            })            
-        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式  
+            })
+        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式
 
 @login_required
 def add_groups(request):
@@ -365,8 +365,8 @@ def add_groups(request):
 def groups_detail(request):
     '''
     show application detail
-    :param request: 
-    :return: 
+    :param request:
+    :return:
     '''
     user = request.user
     gKey = request.GET.get('gKey','')

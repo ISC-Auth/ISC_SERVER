@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 	<head>
-		<title>使用Auth</title>
+		<title>使用CM-Auth</title>
 		<meta charset="utf-8">
 		</script>
 		{% load static %}
@@ -10,13 +10,13 @@
 		<link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
 		<script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
 	</head>
-	<body style="width: 700px; height: 500px; padding: 10px; background-color: #f9f9f9 ">
+	<body style="width: 700px; height: 400px; padding: 10px; background-color: #f9f9f9 ">
 		
 		<div class="container-fluid">
 			<div class="col-xs-3">
-				<p class="text-center">您正在使用Auth<br>尝试登入</p>
+				<p class="text-center">您正在使用CM-Auth<br>尝试登入</p>
 				<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgdmlld0JveD0iMCAwIDE0MCAxNDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjwhLS0KU291cmNlIFVSTDogaG9sZGVyLmpzLzE0MHgxNDAKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNWIxNDQ5Y2JmNiB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE1YjE0NDljYmY2Ij48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjQ0LjA1NDY4NzUiIHk9Ijc0LjUiPjE0MHgxNDA8L3RleHQ+PC9nPjwvZz48L3N2Zz4=" alt="..." class="img-responsive img-circle block-center">
-				<h4 class="text-center">Blog</h4>
+				<h4 class="text-center">聊天室</h4>
 			</div>
 			<script>
 				$(document).ready(function(){
@@ -82,7 +82,7 @@
 									var obj2 = eval("(" + data + ")");
 									if(pushOngoing) {
 										if(obj2["status"] == "ok") {
-											success();
+											success(obj2);
 										}
 										else if(obj2["status"] == "denied") {
 											fail();
@@ -99,10 +99,12 @@
 							}
 						});
 					}
-					function success() {
+					function success(obj) {
 						$("#result-success").show();
 						$("#result-fail").hide();
 						$(".carousel").carousel(2);
+						window.parent.postMessage(obj["data"], obj["parent"]);
+
 					}
 					function fail() {
 						$("#result-fail").show();
@@ -154,7 +156,7 @@
 						$.post("{% url 'isc_auth:text_auth' api_hostname identifer%}", {type: 'call', code: getCodeSix($(this)) }, function(data, textStatus, xhr) {
 							var obj = eval("(" + data + ")");
 							if(obj["status"] == "ok") {
-								success();
+								success(obj);
 							}
 							else if(obj["status"] == "failed") {
 								$("#numlist-phone").attr('data-content', '验证码不正确。');
@@ -186,7 +188,7 @@
 						$.post("{% url 'isc_auth:text_auth' api_hostname identifer%}", {type: 'sms', code: getCodeSix($(this)) }, function(data, textStatus, xhr) {
 							var obj = eval("(" + data + ")");
 							if(obj["status"] == "ok") {
-								success();
+								success(obj);
 							}
 							else if(obj["status"] == "failed") {
 								$("#numlist-sms").attr('data-content', '验证码不正确。');
@@ -217,7 +219,7 @@
 						$.post("{% url 'isc_auth:app_code_auth' api_hostname identifer%}", {type: 'codeapp', code: getCodeSix($(this)) }, function(data, textStatus, xhr) {
 							var obj = eval("(" + data + ")");
 							if(obj["status"] == "ok") {
-								success();
+								success(obj);
 							}
 							else if(obj["status"] == "failed") {
 								$("#numlist-app").attr('data-content', '验证码不正确。');
@@ -289,7 +291,7 @@
 								<button class="btn btn-primary btn-lg btn-block btn-list" style="text-align: left;" btn-data="1">
 								<ul class="list-inline" style="margin-bottom: 0px;">
 									<li><span class="glyphicon glyphicon-check"></span></li>
-									<li>向Auth App推送认证询问</li>
+									<li>向CM-Auth App推送认证询问</li>
 									<li style="float: right;"><span class="badge">最为推荐</span></li>
 								</ul>
 								</button>
@@ -308,7 +310,7 @@
 								<button class="btn btn-primary btn-lg btn-block btn-list" style="text-align: left;" btn-data="4">
 								<ul class="list-inline" style="margin-bottom: 0px;">
 									<li><span class="glyphicon glyphicon-phone"></span></li>
-									<li>输入Auth App中的六位认证码</li>
+									<li>输入CM-Auth App中的六位认证码</li>
 									<li style="float: right;"><span class="badge">离线可用</span></li>
 								</ul>
 								</button>
@@ -317,14 +319,14 @@
 						<div class="item" style="margin-left: 20px;">
 							<div class="panel panel-default list-item" list-order="1">
 								<div class="panel-heading">
-									<h3 class="panel-title">向Auth App推送认证询问</h3>
+									<h3 class="panel-title">向CM-Auth App推送认证询问</h3>
 								</div>
 								<div class="panel-body">
-									<p>请打开您的Auth App，确认此次登录行为。</p>
+									<p>请打开您的CM-Auth App，确认此次登录行为。</p>
 									<div class="alert alert-danger" role="alert" id="authPushError" style="display: none;">
 										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 										<span class="sr-only">Error:</span>
-										Auth App似乎没有连上网络，您需要打开应用或者选择六位验证码的验证方式。
+										CM-Auth App似乎没有连上网络，您需要打开应用或者选择六位验证码的验证方式。
 									</div>
 									<button class="btn btn-default btn-return">选择其他认证方式</button>
 								</div>
@@ -369,10 +371,10 @@
 							</div>
 							<div class="panel panel-default list-item" list-order="4">
 								<div class="panel-heading">
-									<h3 class="panel-title">输入Auth App中的六位认证码</h3>
+									<h3 class="panel-title">输入CM-Auth App中的六位认证码</h3>
 								</div>
 								<div class="panel-body">
-									<p>请打开您的Auth App，并输入此时显示的六位数字验证码：</p>
+									<p>请打开您的CM-Auth App，并输入此时显示的六位数字验证码：</p>
 									<ul class="list-inline form-group" id="numlist-app" data-placement="right" data-content="验证码不正确。" data-trigger="manual" style="width: 260px;">
 										<li><input type="text" class="form-control text-center input-num" maxlength="1" style="width: 30px; padding: 5px 7px; font-size: 23px;"></li>
 										<li><input type="text" class="form-control text-center input-num" maxlength="1" style="width: 30px; padding: 5px 7px; font-size: 23px;"></li>

@@ -83,6 +83,7 @@ class SMS_Call_Tool(object):
             resp = self.__send_sms(phone_number,auth_code,wait_time)
         elif action_type == 'call':
             resp = self.__call(phone_number,auth_code)
+        print('in action')
         print(resp.content)
         # status = self.__parse_response(resp)
         # return status

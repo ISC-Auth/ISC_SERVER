@@ -36,7 +36,7 @@
                             <div class="title-action">
                                 <form class="application application-box websdk" id="remove_app_form" method="post" action="/dashboard/applications/delete/">
                                     {% csrf_token %}
-                                    <input type="hidden" name="iKey" id="iKey" value="{{app.iKey}}">                                               
+                                    <input type="hidden" name="iKey" id="iKey" value="{{app.iKey}}">
                                     <td class="project-actions">
                                         <button type="button" id="remove_app" class="btn btn-danger"><i class="fa fa-close "></i> 删除应用</button>
                                     </td>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="wrapper wrapper-content animated fadeInUp">
-                        <div class="row row-lg detail_title">                    
+                        <div class="row row-lg detail_title">
                             <div class="col-sm-4">
                                 <h3>Details</h3>
                             </div>
@@ -78,6 +78,41 @@
                                                 <div class="col-sm-5 key key_holder">
                                                     <input type="text" readonly="readonly" class="form-control key click_to_select_all" value="{{user.api_hostname}}">
                                                 </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">环境认证回调地址</label>
+                                                <div class="col-sm-5 key key_holder">
+                                                    <input type="text" class="form-control key click_to_select_all" value="">
+                                                </div>
+                                                <div class="checkbox-inline i-checks">
+                                                    <label>
+                                                        <input type="checkbox" checked="" value="option1" name="a"> <i></i></label>
+                                                        <small class="text-navy"> 是否环境认证</small>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">行为认证回调地址</label>
+                                                <div class="col-sm-5 key key_holder">
+                                                    <input type="text" class="form-control key click_to_select_all" value="">
+                                                </div>
+                                                <div class="checkbox-inline i-checks">
+                                                    <label>
+                                                        <input type="checkbox" value="option2" name="a"> <i></i></label>
+                                                        <small class="text-navy">  是否开启行为认证</small>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-3 col-sm-8">
+                                                    <button id="save_app_Btn" class="btn btn-sm btn-info" type="button"><i class="fa fa-check-square-o "></i> 保存更改</button>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">
+                                                  <a class="btn btn-outline btn-info" href= {% static "upload/CM-Auth-SDK.zip" %}>
+                                                    <i class="fa fa-download"></i> SDK 下载
+                                                  </a>
+                                                  </label>
                                             </div>
                                         </form>
                                     </div>
@@ -115,6 +150,20 @@
                     $("#remove_app_form").submit();
                     swal("删除成功！", "您已经永久删除了这条信息。", "success");
                 });
+            });
+            $('#save_app_Btn').click(function () {
+              swal({
+                  title: "您确定要保存修改吗",
+                  text: " ",
+                  type: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#DD6B55",
+                  confirmButtonText: "保存",
+                  closeOnConfirm: false
+              }, function () {
+                  var iKey = $("#iKey").val();
+                  swal("保存成功！", " ", "success");
+              });
             });
         });
     </script>

@@ -88,7 +88,7 @@ class User(models.Model):
     last_login = models.DateTimeField(_('last login'), blank=True, null=True)
 
     @classmethod
-    def new_user_key(self,api_hostname):
+    def new_user_key(self):
         '''
         返回一个参数字典，包含随机生成的uKey(唯一)
         '''

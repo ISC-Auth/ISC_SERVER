@@ -147,7 +147,7 @@ def do_enroll(request,api_hostname):
     phone = request.session['phone']
     #防止重复提交表单，捕获实体完整性错误
     try:
-        user = User.objects.create(user_name=userName,user_phone=phone,account=account)
+        user = User.objects.create(uKey= User.new_user_key()['uKey'], user_name=userName,user_phone=phone,account=account)
         device = Device.objects.create(user=user,account=account,**Device.new_device(api_hostname))
     except IntegrityError as e:
         user = User.objects.get(user_name=userName)
@@ -203,9 +203,8 @@ def check_bind(request,api_hostname,identifer):
         else:
             time.sleep(5)
     #120秒内未发现可用连接
-    else:
-        bind_url = reverse('isc_auth:bind_device',args=(api_hostname,identifer))
-        return HttpResponse(content=json.dumps({'status':'pending'}))
+    bind_url = reverse('isc_auth:bind_device',args=(api_hostname,identifer))
+    return HttpResponse(content=json.dumps({'status':'pending'}))
 ##
 
 
