@@ -19,4 +19,9 @@ urlpatterns = [
     url(r'^get_groups', views.get_groups, name='get_groups'),
     url(r'^groups/detail/$', views.groups_detail , name='groups_detail'),
     url(r'^groups/delete',views.delete_groups, name= 'delete_groups'),
+    url(r'^device/$', views.device, name='device'),
+    url(r'^device/add/$', views.add_device, name='add_device'),
+    url(r'^get_device', views.get_device, name='get_device'),
+    url(r'^device/detail/$', views.device_detail , name='device_detail'),
+    url(r'^device/delete',views.delete_device, name= 'delete_device'),
 ]

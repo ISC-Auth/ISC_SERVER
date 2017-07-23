@@ -1,9 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from .models import User
+from .models import User,Device
 
 class UserForm(forms.ModelForm):
-    
+
     error_messages = {
         'duplicate_name': _('您所填写的用户名已被其它用户使用.'),
     }
@@ -12,7 +12,7 @@ class UserForm(forms.ModelForm):
         model = User
         fields = '__all__'
     def clean(self):
-        
+
         # Since User.email is unique, this check is redundant,
         # but it sets a nicer error message than the ORM. See #13147.
         user_name = self.cleaned_data['user_name']
@@ -23,11 +23,21 @@ class UserForm(forms.ModelForm):
                 code='duplicate_name',
             )
         return self.cleaned_data
-        
+
     def save(self, commit=True):
         new_user = super(UserForm, self).save(commit=False)
         new_user.uKey = User.new_user_key(user.api_hostname)['uKey']
         if commit:
             new_user.save()
         return new_user
-    
+
+class DeviceForm(forms.ModelForm):
+    class Meta:
+        model = Device
+        fields = '__all__'
+
+    def __init__(self,*args,**kwargs):
+        super(DeviceForm,self).__init__(*args,**kwargs)
+        for fieldname in self.base_fields:  #循环给所有字段加样式
+            field = self.base_fields[fieldname]
+            field.widget.attrs.update({'class':'form-control'})

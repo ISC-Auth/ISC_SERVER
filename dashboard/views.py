@@ -5,11 +5,13 @@ from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from .models import Application,Account,User,Group
+from .models import Application,Account,User,Group,Device
 from django.core import serializers
-from django.db.models import Count, Sum
+from django.db.models import Count,Sum
+from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
+from .forms import DeviceForm
 
 import time,json
 
@@ -391,3 +393,145 @@ def delete_groups(request):
         uKey = request.POST.get('uKey','')
         User.objects.filter(uKey=uKey).delete()
     return HttpResponseRedirect(reverse('users'))
+
+@login_required
+def device(request,args=None):
+    user = request.user
+    state=None
+    if args:
+        print(args)
+        state = args['state']
+    content = {
+        'active_menu' : 'Device',
+        'user' : user,
+        'state': state,
+    }
+    return render(request,'dashboard/device/index.html',content)
+
+@login_required
+def get_device(request):
+    '''
+    get application lists
+    :param request:
+    :return:
+    '''
+    user = request.user
+    if request.method == "GET":
+        limit = request.GET.get('limit')   # how many items per page
+        offset = request.GET.get('offset')  # how many items in total in the DB
+        search = request.GET.get('search')
+        sort_column = request.GET.get('sort')   # which column need to sort
+        order = request.GET.get('order')      # ascending or descending
+        if search:    #    判断是否有搜索字
+            all_records = Device.objects.filter(id=search,asset_type=search,business_unit=search)
+        else:
+            all_records = Device.objects.filter(account= user)  # must be wirte the line code here
+
+        if sort_column:   # 判断是否有排序需求
+            sort_column = sort_column.replace('asset_', '')
+            if sort_column in ['name']:   # 如果排序的列表在这些内容里面
+                if order == 'desc':   # 如果排序是反向
+                    sort_column = '-%s' % (sort_column)
+                all_records = Device.objects.filter(account= user).order_by(sort_column)
+
+        all_records_count=all_records.count()
+
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 20    # 默认是每页20行的内容，与前端默认行数一致
+        pageinator = Paginator(all_records, limit)   # 开始做分页
+
+        page = int(int(offset) / int(limit) + 1)
+        response_data = {'total':all_records_count,'rows':[]}   # 必须带有rows和total这2个key，total表示总页数，rows表示每行的内容
+
+
+        for asset in pageinator.page(page):
+            get_user = model_to_dict(User.objects.get(id = asset.user_id))
+            response_data['rows'].append({
+                "asset_name": '<a href="/dashboard/device/detail/?iKey=%s">%s</a>' %(asset.identifer,asset.device_name),
+                "asset_platform": asset.platform if asset.platform else "",
+                "asset_device_model": asset.device_model if asset.device_model else "",
+                "asset_user": get_user['user_name'] if get_user['user_name'] else "",
+            })
+        return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式
+
+@login_required
+def add_device(request):
+    user = request.user
+    state = None
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        account = Account.objects.get(api_hostname= user.api_hostname)
+        account_user = User.objects.filter(account= account)
+        qs = account_user.filter(user_name__iexact=user_name)
+        if qs.exists():
+            content = {
+                'duplicate_name': '您所填写的用户名已被其它用户使用.',
+                'state': 'error',
+            }
+            return render(request,'dashboard/users/add.html',content)
+        new_user = User(
+            uKey = User.new_user_key()['uKey'],
+            user_name = request.POST.get('user_name'),
+            account = Account.get_account(user.api_hostname),
+        )
+        new_user.save()
+        return HttpResponseRedirect("/dashboard/users/detail/?uKey=%s"%(new_user.uKey))
+    print(123)
+    content = {
+        'active_menu' : 'add_users',
+        'user' : user,
+        'state': state,
+
+    }
+    return render(request,'dashboard/users/add.html',content)
+
+@login_required
+def device_detail(request):
+    '''
+    show device detail
+    :param request:
+    :return:
+    '''
+    user = request.user
+    if request.method == 'POST':
+        identifer = request.POST.get('identifer','')
+        if request.POST.get('activated','') == '':
+            activated = False
+        else:
+            activated = True
+        device_name = request.POST.get('device_name','')
+        if Device.objects.filter(identifer = identifer).update(is_activated = activated,device_name = device_name):
+            device = Device.objects.get(identifer = identifer)
+            content = {
+                'active_menu' : 'Device',
+                'user' : user,
+                'device' : device,
+            }
+            return render(request,'dashboard/device/device_detail.html',content)
+    else:
+        identifer = request.GET.get('iKey','')
+        if identifer == '':
+            return HttpResponseRedirect(reverse('device'))
+        try:
+            device = Device.objects.get(identifer= identifer)
+        except Application.DoesNotExist:
+            return HttpResponseRedirect(reverse('device'))
+        content = {
+            'active_menu' : 'Device',
+            'user' : user,
+            'device' : device,
+        }
+        return render(request,'dashboard/device/device_detail.html',content)
+
+@login_required
+def delete_device(request):
+    user = request.user
+    if request.method == 'POST':
+        identifer = request.POST.get('iKey','')
+        device = model_to_dict(Device.objects.get(identifer = identifer))
+        user_id = device['user']
+        Device.objects.filter(identifer=identifer).delete()
+        User.objects.filter(id = user_id).delete()
+    return HttpResponseRedirect(reverse('device'))

@@ -93,4 +93,4 @@ class Account(AbstractUser):
         return self.objects.get(api_hostname=api_hostname)
 
     def __str__(self):
-        return "%s | %s | %s" %(self.account_email,self.account_name,self.api_hostname)
+        return "%s | %s | %s" %(self.email,self.account_name,self.api_hostname)

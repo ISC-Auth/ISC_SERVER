@@ -1,0 +1,159 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+{% include "dashboard/include.html" %}
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+    <div id="wrapper">
+        <!--左侧导航开始-->
+        {% include "dashboard/navbar.html" %}
+        <!--左侧导航结束-->
+        <!--右侧部分开始-->
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            <div class="row border-bottom">
+                {% include "dashboard/navbartop.html" %}
+            </div>
+            <div class="row J_mainContent" id="content-main">
+                <div class="gray-bg">
+                    <div class="row wrapper border-bottom white-bg page-heading  fadeInUp">
+                        <div class="col-sm-4">
+                            <h2>{{device.device_name}}</h2>
+                            <ol class="breadcrumb">
+                                <li>
+                                    <a href="index.html">仪表盘</a>
+                                </li>
+                                <li>
+                                    <a href= {% url 'device' %}>设备</a>
+                                </li>
+                                <li>
+                                    <strong>{{device.device_name}}</strong>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="title-action">
+                                <div class="col-sm-6">
+                                    <form class="application application-box websdk" id="remove_user_form" method="post" action="/dashboard/device/delete/">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="iKey" id="iKey" value="{{device.identifer}}">
+                                        <td class="project-actions">
+                                            <button type="button" id="remove_device" class="btn btn-danger"><i class="fa fa-close "></i> 删除设备</button>
+                                        </td>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper wrapper-content animated fadeInUp">
+                        <div class="row row-lg detail_title">
+                            <div class="col-sm-4">
+                                <h3>详细信息</h3>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-content">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <form method="post" action="." class="form-horizontal" id="modify_device">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">设备名</label>
+                                                <div class="col-sm-5 ">
+                                                    <input type="text" class="form-control key click_to_select_all" value="{{device.device_name}}" name="device_name">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">型号</label>
+                                                <div class="col-sm-5 ">
+                                                    <input type="text" class="form-control key click_to_select_all" value="{{device.device_model}}" name="device_model">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">平台</label>
+                                                <div class="col-sm-5 ">
+                                                    <input type="text" class="form-control key click_to_select_all" value="{{device.platform}}" name="platform">
+                                                </div>
+                                            </div>
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{device.identifer}}" name="identifer">
+                                            <!--<div class="hr-line-dashed"></div>-->
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">状态</label>
+                                                <div class="col-sm-5">
+                                                    <div class="i-checks">
+                                                        <label>
+                                                            <input type="checkbox" {% if device.is_activated %} checked="" {% endif %} value="true" name="activated"> <i></i>
+                                                        </label>
+                                                        </br>
+                                                        <small class="text-navy"> 是否激活</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-3 col-sm-8">
+                                                    <button id="saveBtn" class="btn btn-sm btn-info" type="button"><i class="fa fa-check-square-o "></i> 保存更改</button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-3 col-sm-8">
+                                                    <button class="btn btn-sm btn-info" type="button"><i class="fa fa-check-square-o "></i> <a href="http://182.254.147.95:8000/api-{{user.api_hostname}}/{{device.identifer}}/frame/startwificollect/ ">开始收集</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--右侧部分结束-->
+    </div>
+
+    <!-- 全局js -->
+    {% include "dashboard/script.html" %}
+
+    <!-- 自定义js -->
+    <script src={% static "js/hAdmin.js" %}></script>
+
+    <!-- 第三方插件 -->
+    <script src={% static "js/plugins/pace/pace.min.js" %}></script>
+    <script>
+        $(document).ready(function () {
+            $('#remove_device').click(function () {
+                swal({
+                    title: "您确定要删除这个设备吗",
+                    text: "删除后将无法恢复，请谨慎操作！",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "删除",
+                    closeOnConfirm: false
+                }, function () {
+                    var iKey = $("#iKey").val();
+                    $("#remove_user_form").submit();
+                    swal("删除成功！", "您已经永久删除了这个设备。", "success");
+                });
+            });
+            $('#saveBtn').click(function () {
+                swal({
+                    title: "您确定要保存修改",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "保存",
+                    closeOnConfirm: false
+                }, function () {
+                    var iKey = $("#iKey").val();
+                    $("#modify_device").submit();
+                    swal("保存成功！", "success");
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

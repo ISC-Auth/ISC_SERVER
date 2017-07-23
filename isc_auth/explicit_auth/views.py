@@ -6,6 +6,7 @@ from django.http import HttpRequest,HttpResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db.utils import IntegrityError
 from django.core.cache import cache
+from django.forms.models import model_to_dict
 
 from channels import Group
 from channels.asgi import get_channel_layer
@@ -148,7 +149,7 @@ def do_enroll(request,api_hostname):
     #防止重复提交表单，捕获实体完整性错误
     try:
         user = User.objects.create(uKey= User.new_user_key()['uKey'], user_name=userName,user_phone=phone,account=account)
-        device = Device.objects.create(user=user,account=account,**Device.new_device(api_hostname))
+        device = Device.objects.create(user=user,account=account,device_name="phone-"+phone,**Device.new_device(api_hostname))
     except IntegrityError as e:
         user = User.objects.get(user_name=userName)
         device = user.device_set.all()[0]
@@ -330,6 +331,23 @@ def auth(request,api_hostname,identifer):
         return HttpResponse(content=json.dumps({'status':'pending'}))
 ##
 
+def getPCUrl(request, api_hostname):
+    key = createRandomFields(40)
+    username = request.GET.get('username','')
+    callback = request.GET.get('callback','')
+    account = Account.objects.get(api_hostname= api_hostname)
+    user = User.objects.get(user_name = username)
+    device = model_to_dict(Device.objects.filter(account = account).get(user = user))
+    identifer = device['identifer']
+
+    cache.set("device-%s-%s_pc_key" %(identifer,api_hostname), key, 60)
+
+    url = "iscauth://%s-%s-%s" % (identifer, api_hostname, key)
+    data ={
+        'url':url,
+    }
+
+    return HttpResponse('%s(%s)' % (callback,json.dumps(data)))
 
 def pctest(request, api_hostname, identifer):
 
