@@ -181,8 +181,7 @@ def bind_device(request,api_hostname,identifer):
 def check_bind(request,api_hostname,identifer):
     #每10秒检查一次socket连接,最多不超过180秒
     #300
-    for i in range(36):
-        print(i)
+    for i in range(30):
         group_name = "device-%s-%s" %(identifer,api_hostname)
         device_group_list = get_session_from_group(group_name, "mobile")
         if device_group_list:
@@ -202,7 +201,7 @@ def check_bind(request,api_hostname,identifer):
             Group(group_name).send({"text":base64.b64encode(content_encrypt).decode()})
             return HttpResponse(content=json.dumps({'status':'ok'}))
         else:
-            time.sleep(5)
+            time.sleep(2)
     #120秒内未发现可用连接
     bind_url = reverse('isc_auth:bind_device',args=(api_hostname,identifer))
     return HttpResponse(content=json.dumps({'status':'pending'}))
@@ -288,18 +287,24 @@ def auth_check_ws(request,api_hostname,identifer):
 
     channel_layer = get_channel_layer()
     device_group_name = "device-%s-%s" %(identifer,api_hostname)
-    # 每3秒检查一次socket连接,最多不超过60秒
-    for i in range(20):
+    # 每3秒检查一次socket连接,最多不超过30秒
+    for i in range(60):
         device_group_list = get_session_from_group(device_group_name, "mobile")
+        print('in ws',device_group_list)
         if device_group_list:
             key = get_session_from_group(device_group_name, "mobile", "key")
             data = {"xxx":"xxx"}
+            print('start random')
             random,code = app_auth_tools.gen_b64_encrypt_explicit_auth_code(key,data)
-            cache.set("device-%s-%s_explicit_random" %(identifer,api_hostname),random,118)
+            print('end random')
+            cache.set("device-%s-%s_explicit_random" %(identifer,api_hostname),random,58)
+            print('staret send',time.time())
             Group(device_group_name).send({"text":code})
+            print('finish send',time.time())
             return HttpResponse(content=json.dumps({'status':'ok'}))
         else:
-            time.sleep(3)
+            print('empty')
+            time.sleep(1)
     # 60秒内未发现可用连接
     else:
         return HttpResponse(content=json.dumps({'status':'pending'}))
@@ -314,8 +319,10 @@ def auth(request,api_hostname,identifer):
     device_group_name = "device-%s-%s" %(identifer,api_hostname)
     device_group_list = get_session_from_group(device_group_name, "mobile")
     #若连接中断
+    
     if device_group_list is None:
-        return HttpResponse(content=json.dumps({'status':'pending','seq':request.session['seq']}))
+    	print('socket disconnect')
+        #return HttpResponse(content=json.dumps({'status':'pending'}))
 
     # 每3秒检查一次认证情况,最多不超过60秒
     for i in range(20):

@@ -87,16 +87,16 @@
 										else if(obj2["status"] == "denied") {
 											fail();
 										}
-										else {
-											sendAuthPush();
-										}
+										// else {
+										// 	sendAuthPush();
+										// }
 									}
 								});
 							}
-							else if(obj["status"] == "pending") {
-								$("#authPushPending").slideDown();
-								sendAuthPush();
-							}
+							// else if(obj["status"] == "pending") {
+							// 	$("#authPushPending").slideDown();
+							// 	sendAuthPush();
+							// }
 						});
 					}
 					function success(obj) {

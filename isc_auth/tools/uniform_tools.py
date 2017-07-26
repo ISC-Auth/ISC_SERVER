@@ -22,12 +22,10 @@ def del_chanell_session(message,*sessions):
 
 
 def get_session_from_group(group_name, device_type, session=None):
-    print(group_name)
     if len(get_channel_layer().group_channels(group_name)) > 0:
         channels_list = list(get_channel_layer().group_channels(group_name).keys())
     
         for channel in channels_list:
-            print(channel)
             sessions = session_for_reply_channel(channel)
             if sessions["device_type"] == device_type:
                 if session is not None:

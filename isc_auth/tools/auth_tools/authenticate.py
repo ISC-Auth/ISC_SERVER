@@ -2,7 +2,7 @@ import numpy as np
 from isc_auth.tools.auth_tools.preprocessing import WiFiFeatureExtractor
 from sklearn.externals import joblib
 
-MODEL_PATH = "new_model.pkl"
+MODEL_PATH = "new_model4.pkl"
 extractor = WiFiFeatureExtractor()
 model = joblib.load(MODEL_PATH)
 def authenticate(pc_wifi,mobile_wifi):

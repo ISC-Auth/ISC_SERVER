@@ -13,6 +13,7 @@ START_TIME=10
 SCAN_TIME = 9
 
 def start_wifi_collect(api_hostname, identifer):
+    time.sleep(3)
     device = Device.objects.get(identifer = identifer)
     key = device.dKey
 

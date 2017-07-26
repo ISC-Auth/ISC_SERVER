@@ -10,6 +10,7 @@ from dashboard.models import Device
 from django.db.models import Empty
 from isc_auth.tools.auth_tools.timer import setTimer
 from collections import deque
+from isc_auth.tools.auth_tools.wifi_auth_tools import start_wifi_collect
 
 
 @channel_session
@@ -150,6 +151,8 @@ def pc_auth_message_handle(message, api_hostname, identifer, device_type):
         message.reply_channel.send({"text": "OK"})
         message.channel_session['device_type'] = "pc"
         Group("device-%s-%s" %(identifer,api_hostname)).add(message.reply_channel)
+        start_wifi_collect(api_hostname,identifer)
+        
     else:
         message.reply_channel.send({"close":True})
 
